@@ -1,629 +1,727 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chương trình Lucky Draw</title>
     <style>
-        /* CSS Styles */
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --danger-color: #dc3545;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --border-color: #dee2e6;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+      /* CSS Styles */
+      :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #6c757d;
+        --success-color: #198754;
+        --danger-color: #dc3545;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --border-color: #dee2e6;
+        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
 
-        body {
-            font-family: var(--font-family);
-            background-color: #f0f2f5;
-            color: var(--dark-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-            box-sizing: border-box;
-            transition: background-image 0.5s ease-in-out;
-        }
+      body {
+        font-family: var(--font-family);
+        background-color: #f0f2f5;
+        color: var(--dark-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+        box-sizing: border-box;
+        transition: background-image 0.5s ease-in-out;
+      }
 
-        .container {
-            background-color: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 850px;
-            transition: all 0.3s ease-in-out;
-            position: relative;
-        }
+      .container {
+        background-color: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 850px;
+        transition: all 0.3s ease-in-out;
+        position: relative;
+      }
 
-        body.custom-bg .container {
-            background-color: transparent;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            box-shadow: none;
-            border: none;
-        }
+      body.custom-bg .container {
+        background-color: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none;
+        border: none;
+      }
 
-        h1, h2 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-        
-        h2 {
-            color: var(--dark-color);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-top: 2rem;
-        }
-        
-        body.custom-bg h1, body.custom-bg h2, body.custom-bg label, body.custom-bg small {
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        
-        body.custom-bg h2 {
-             border-bottom-color: rgba(255,255,255,0.5);
-        }
+      h1,
+      h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+      }
 
-        .hidden {
-            display: none;
-        }
+      h2 {
+        color: var(--dark-color);
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5rem;
+        margin-top: 2rem;
+      }
 
-        /* Giao diện Cài đặt */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+      body.custom-bg h1,
+      body.custom-bg h2,
+      body.custom-bg label,
+      body.custom-bg small {
+        color: white;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
+      body.custom-bg h2 {
+        border-bottom-color: rgba(255, 255, 255, 0.5);
+      }
 
-        .form-group input[type="number"],
-        .form-group input[type="text"],
-        .form-group input[type="file"],
-        select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
+      .hidden {
+        display: none;
+      }
 
-        .form-group input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-        }
+      /* Giao diện Cài đặt */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
 
-        .prize-item {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-            align-items: center;
-        }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
 
-        .prize-item input[type="text"] {
-            flex-grow: 1;
-        }
+      .form-group input[type="number"],
+      .form-group input[type="text"],
+      .form-group input[type="file"],
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
 
-        .prize-item input[type="number"] {
-            width: 120px;
-            flex-shrink: 0;
-        }
-        
-        .prize-item .remove-prize-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            line-height: 30px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+      .form-group input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+      }
 
-        .btn, .btn-primary, .btn-secondary, .btn-tertiary {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
+      .prize-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        align-items: center;
+      }
 
-        .btn:active, .btn-primary:active, .btn-secondary:active {
-            transform: scale(0.97);
-        }
+      .prize-item input[type="text"] {
+        flex-grow: 1;
+      }
 
-        .btn-tertiary {
-            background: none;
-            border: 2px dashed var(--secondary-color);
-            color: var(--secondary-color);
-            width: 100%;
-        }
-        .btn-tertiary:hover {
-            background-color: #f8f9fa;
-        }
-        
-        body.custom-bg .btn-tertiary {
-            border-color: rgba(255,255,255,0.7);
-            color: white;
-        }
+      .prize-item input[type="number"] {
+        width: 120px;
+        flex-shrink: 0;
+      }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            width: 100%;
-            margin-top: 1.5rem;
-            font-size: 1.2rem;
-            padding: 1rem;
-        }
-        .btn-primary:hover {
-            background-color: #0b5ed7;
-        }
+      .prize-item .remove-prize-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1rem;
+        line-height: 30px;
+        text-align: center;
+        flex-shrink: 0;
+      }
 
-        .btn-secondary {
-             background-color: var(--secondary-color);
-             color: white;
-        }
-        .btn-secondary:hover {
-             background-color: #5c636a;
-        }
-        
-        #main-view {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-        #main-view:not(.hidden) {
-            display: flex;
-        }
-        
-        #main-lottery-interface, .history {
-            width: 100%;
-        }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .btn-tertiary {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
 
-        #lottery-display {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2.5rem 0;
-        }
+      .btn:active,
+      .btn-primary:active,
+      .btn-secondary:active {
+        transform: scale(0.97);
+      }
 
-        .digit-box {
-            width: 70px;
-            height: 90px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            background-image: linear-gradient(180deg, #ffffff, #f1f1f1);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            color: var(--dark-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 3px rgba(255,255,255,0.7);
-            text-shadow: 0 1px 1px white;
-            transition: all 0.3s ease;
-        }
-        
-        body.custom-bg .digit-box {
-             background-color: rgba(255,255,255,0.25);
-             border-color: rgba(255,255,255,0.3);
-             color: white;
-             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-        }
+      .btn-tertiary {
+        background: none;
+        border: 2px dashed var(--secondary-color);
+        color: var(--secondary-color);
+        width: 100%;
+      }
+      .btn-tertiary:hover {
+        background-color: #f8f9fa;
+      }
 
-        .digit-box.stopped {
-            border-color: var(--danger-color);
-            color: var(--danger-color);
-            background-image: linear-gradient(180deg, #f8f9fa, #e9ecef);
-            transform: scale(1.05);
-        }
-        
-        body.custom-bg .digit-box.stopped {
-             background-color: rgba(255, 255, 255, 0.2);
-             border-color: rgba(255, 82, 82, 0.8);
-             color: #ff5252;
-             text-shadow: 0 0 5px white, 0 0 10px white;
-        }
+      body.custom-bg .btn-tertiary {
+        border-color: rgba(255, 255, 255, 0.7);
+        color: white;
+      }
 
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        width: 100%;
+        margin-top: 1.5rem;
+        font-size: 1.2rem;
+        padding: 1rem;
+      }
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+      }
 
-        .controls select {
-            width: auto;
-            flex-grow: 1;
-            max-width: 400px;
-        }
+      .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+      }
+      .btn-secondary:hover {
+        background-color: #5c636a;
+      }
 
-        #start-btn {
-            background-color: var(--success-color);
-            color: white;
-        }
-        #start-btn:hover {
-            background-color: #157347;
-        }
-        #start-btn:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-        }
+      #main-view {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+      #main-view:not(.hidden) {
+        display: flex;
+      }
 
-        #winner-info, #multiple-winners-info {
-            text-align: center;
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background-color: #d1e7dd;
-            border-left: 7px solid var(--success-color);
-            border-radius: 8px;
-            display: none; /* Ẩn ban đầu */
-            animation: fadeIn 0.5s ease;
-        }
-        
-        body.custom-bg #winner-info, body.custom-bg #multiple-winners-info {
-            background-color: rgba(25, 135, 84, 0.7);
-            color: white;
-            border-left-color: #fff;
-        }
+      #main-lottery-interface,
+      .history {
+        width: 100%;
+      }
 
-        #winner-info h3, #multiple-winners-info h3 {
-            color: var(--success-color);
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        
-        body.custom-bg #winner-info h3, body.custom-bg #winner-info p,
-        body.custom-bg #multiple-winners-info h3, body.custom-bg #multiple-winners-info p {
-             color: white;
-        }
-        
-        #winner-info p {
-            margin: 0.5rem 0 0;
-            font-size: 1.1rem;
-        }
-        
-        #multiple-winners-info ul {
-            list-style: none;
-            padding: 0;
-            margin: 1rem 0;
-            text-align: left;
-            display: inline-block;
-        }
-        
-        #multiple-winners-info li {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
+      #lottery-display {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2.5rem 0;
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+      .digit-box {
+        width: 70px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3.5rem;
+        font-weight: bold;
+        background-image: linear-gradient(180deg, #ffffff, #f1f1f1);
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        color: var(--dark-color);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+          inset 0 1px 3px rgba(255, 255, 255, 0.7);
+        text-shadow: 0 1px 1px white;
+        transition: all 0.3s ease;
+      }
 
-        .history {
-            text-align: center;
-        }
-        
-        body.custom-bg .history {
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 1.5rem 2.5rem 2.5rem 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        body.custom-bg .history h2 {
-            color: var(--dark-color);
-            text-shadow: none;
-            border-bottom-color: var(--border-color);
-        }
+      body.custom-bg .digit-box {
+        background-color: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      }
 
-        #history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
+      .digit-box.stopped {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+        background-image: linear-gradient(180deg, #f8f9fa, #e9ecef);
+        transform: scale(1.05);
+      }
 
-        #history-table th, #history-table td {
-            border: 1px solid var(--border-color);
-            padding: 0.8rem 1rem;
-            text-align: center;
-        }
+      body.custom-bg .digit-box.stopped {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 82, 82, 0.8);
+        color: #ff5252;
+        text-shadow: 0 0 5px white, 0 0 10px white;
+      }
 
-        #history-table th {
-            background-color: var(--light-color);
-            font-weight: 600;
-        }
-        
-        body.custom-bg .history #history-table th {
-            color: var(--dark-color);
-            text-shadow: none;
-        }
-        
-        body.custom-bg .history #history-table td {
-            color: var(--dark-color);
-            text-shadow: none;
-        }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
 
-        #history-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        body.custom-bg .history #history-table tbody tr:nth-child(even) {
-            background-color: #f0f2f5;
-        }
-        body.custom-bg .history #history-table tbody tr:nth-child(odd) {
-            background-color: white;
-        }
+      .controls select {
+        width: auto;
+        flex-grow: 1;
+        max-width: 400px;
+      }
 
-        /* Confirmation Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
+      #start-btn {
+        background-color: var(--success-color);
+        color: white;
+      }
+      #start-btn:hover {
+        background-color: #157347;
+      }
+      #start-btn:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+      }
 
-        .modal-content {
-            background: white;
-            padding: 2rem 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            width: 90%;
-            max-width: 500px;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-        
-        body.custom-bg .modal-content {
-             background-color: rgba(40,40,40,0.85);
-             backdrop-filter: blur(10px);
-             -webkit-backdrop-filter: blur(10px);
-        }
+      #winner-info,
+      #multiple-winners-info {
+        text-align: center;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background-color: #d1e7dd;
+        border-left: 7px solid var(--success-color);
+        border-radius: 8px;
+        display: none; /* Ẩn ban đầu */
+        animation: fadeIn 0.5s ease;
+      }
 
-        .modal-content h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
+      body.custom-bg #winner-info,
+      body.custom-bg #multiple-winners-info {
+        background-color: rgba(25, 135, 84, 0.7);
+        color: white;
+        border-left-color: #fff;
+      }
 
-        .modal-content p {
-            margin: 1rem 0;
-            font-size: 1.1rem;
-        }
-        
-        body.custom-bg .modal-content h3, body.custom-bg .modal-content p {
-            color: white;
-        }
+      #winner-info h3,
+      #multiple-winners-info h3 {
+        color: var(--success-color);
+        margin: 0;
+        font-size: 1.5rem;
+      }
 
-        .modal-buttons {
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
+      body.custom-bg #winner-info h3,
+      body.custom-bg #winner-info p,
+      body.custom-bg #multiple-winners-info h3,
+      body.custom-bg #multiple-winners-info p {
+        color: white;
+      }
+
+      #winner-info p {
+        margin: 0.5rem 0 0;
+        font-size: 1.1rem;
+      }
+
+      #multiple-winners-info ul {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+        text-align: left;
+        display: inline-block;
+      }
+
+      #multiple-winners-info li {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
         }
-        
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: -1rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            gap: 0.5rem;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .checkbox-container input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
+      }
+
+      .history {
+        text-align: center;
+      }
+
+      body.custom-bg .history {
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 1.5rem 2.5rem 2.5rem 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      body.custom-bg .history h2 {
+        color: var(--dark-color);
+        text-shadow: none;
+        border-bottom-color: var(--border-color);
+      }
+
+      #history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      #history-table th,
+      #history-table td {
+        border: 1px solid var(--border-color);
+        padding: 0.8rem 1rem;
+        text-align: center;
+      }
+
+      #history-table th {
+        background-color: var(--light-color);
+        font-weight: 600;
+      }
+
+      body.custom-bg .history #history-table th {
+        color: var(--dark-color);
+        text-shadow: none;
+      }
+
+      body.custom-bg .history #history-table td {
+        color: var(--dark-color);
+        text-shadow: none;
+      }
+
+      #history-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      body.custom-bg .history #history-table tbody tr:nth-child(even) {
+        background-color: #f0f2f5;
+      }
+      body.custom-bg .history #history-table tbody tr:nth-child(odd) {
+        background-color: white;
+      }
+
+      /* Confirmation Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      .modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 2rem 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        width: 90%;
+        max-width: 500px;
+        transform: scale(0.9);
+        transition: transform 0.3s;
+      }
+
+      body.custom-bg .modal-content {
+        background-color: rgba(40, 40, 40, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .modal-content h3 {
+        margin-top: 0;
+        color: var(--primary-color);
+      }
+
+      .modal-content p {
+        margin: 1rem 0;
+        font-size: 1.1rem;
+      }
+
+      body.custom-bg .modal-content h3,
+      body.custom-bg .modal-content p {
+        color: white;
+      }
+
+      .modal-buttons {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: -1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        gap: 0.5rem;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="container">
-        <!-- Giao diện 1: Cài đặt thông tin -->
-        <div id="setup-view">
-            <h1>Cài đặt Lucky Draw</h1>
-            <form id="setup-form">
-                <div class="form-group">
-                    <label for="lottery-title-input">Tên chương trình Lucky Draw:</label>
-                    <input type="text" id="lottery-title-input" placeholder="Nhập tên chương trình (mặc định: Lucky Draw)">
-                </div>
-                
-                <div class="form-group">
-                    <label for="num-digits">Số lượng ký tự mã số (1-10):</label>
-                    <input type="number" id="num-digits" value="6" min="1" max="10" required>
-                </div>
+      <!-- Giao diện 1: Cài đặt thông tin -->
+      <div id="setup-view">
+        <h1>Cài đặt Lucky Draw</h1>
+        <form id="setup-form">
+          <div class="form-group">
+            <label for="lottery-title-input"
+              >Tên chương trình Lucky Draw:</label
+            >
+            <input
+              type="text"
+              id="lottery-title-input"
+              placeholder="Nhập tên chương trình (mặc định: Lucky Draw)"
+            />
+          </div>
 
-                <div class="form-group">
-                    <label for="customer-file">Tải lên file CSV thông tin người chơi:</label>
-                    <input type="file" id="customer-file" accept=".csv" required>
-                    <small><i>*File CSV cần có cột "ma_so" và "ten_kh" (viết liền không dấu). Mã số có thể chứa chữ và số.</i></small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="background-file">Chọn ảnh nền (tùy chọn):</label>
-                    <input type="file" id="background-file" accept="image/*">
-                </div>
+          <div class="form-group">
+            <label for="num-digits">Số lượng ký tự mã số (1-10):</label>
+            <input
+              type="number"
+              id="num-digits"
+              value="6"
+              min="1"
+              max="10"
+              required
+            />
+          </div>
 
-                <div class="form-group">
-                    <label>Thông tin giải thưởng:</label>
-                    <div id="prizes-container">
-                        <!-- Các giải thưởng sẽ được thêm vào đây -->
-                    </div>
-                    <button type="button" id="add-prize-btn" class="btn btn-tertiary" style="margin-top: 1rem;">+ Thêm giải thưởng</button>
-                </div>
+          <div class="form-group">
+            <label for="customer-file"
+              >Tải lên file CSV thông tin người chơi:</label
+            >
+            <input type="file" id="customer-file" accept=".csv" required />
+            <small
+              ><i
+                >*File CSV cần có cột "ma_so" và "ten_kh" (viết liền không dấu).
+                Mã số có thể chứa chữ và số.</i
+              ></small
+            >
+          </div>
 
-                <div class="checkbox-container">
-                    <input type="checkbox" id="multi-winner-mode">
-                    <label for="multi-winner-mode">Quay nhiều giải cùng lúc</label>
-                </div>
+          <div class="form-group">
+            <label for="background-file">Chọn ảnh nền (tùy chọn):</label>
+            <input type="file" id="background-file" accept="image/*" />
+          </div>
 
-                <button type="submit" class="btn btn-primary">Bắt đầu Chương trình</button>
-            </form>
+          <div class="form-group">
+            <label>Thông tin giải thưởng:</label>
+            <div id="prizes-container">
+              <!-- Các giải thưởng sẽ được thêm vào đây -->
+            </div>
+            <button
+              type="button"
+              id="add-prize-btn"
+              class="btn btn-tertiary"
+              style="margin-top: 1rem"
+            >
+              + Thêm giải thưởng
+            </button>
+          </div>
+
+          <div class="checkbox-container">
+            <input type="checkbox" id="multi-winner-mode" />
+            <label for="multi-winner-mode">Quay nhiều giải cùng lúc</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Bắt đầu Chương trình
+          </button>
+        </form>
+      </div>
+
+      <!-- Giao diện 2: Xổ số chính -->
+      <div id="main-view" class="hidden">
+        <div id="main-lottery-interface">
+          <h1 id="lottery-title-display">Lucky Draw</h1>
+          <div id="lottery-display">
+            <!-- Các ô số sẽ được tạo bằng JavaScript -->
+          </div>
+
+          <div class="controls">
+            <select id="prize-select" class="btn"></select>
+            <button id="start-btn" class="btn">QUAY SỐ</button>
+          </div>
+
+          <div id="winner-info" class="hidden">
+            <h3>CHÚC MỪNG</h3>
+            <p>
+              Người chơi: <strong id="winner-name"></strong> - Mã số:
+              <strong id="winner-code"></strong>
+            </p>
+          </div>
+
+          <div id="multiple-winners-info" class="hidden">
+            <h3>CHÚC MỪNG</h3>
+            <p>Giải thưởng: <strong id="multi-prize-name"></strong></p>
+            <ul id="multi-winners-list"></ul>
+          </div>
         </div>
 
-        <!-- Giao diện 2: Xổ số chính -->
-        <div id="main-view" class="hidden">
-            
-            <div id="main-lottery-interface">
-                <h1 id="lottery-title-display">Lucky Draw</h1>
-                <div id="lottery-display">
-                    <!-- Các ô số sẽ được tạo bằng JavaScript -->
-                </div>
-
-                <div class="controls">
-                    <select id="prize-select" class="btn"></select>
-                    <button id="start-btn" class="btn">QUAY SỐ</button>
-                </div>
-                
-                <div id="winner-info" class="hidden">
-                    <h3>CHÚC MỪNG</h3>
-                    <p>Người chơi: <strong id="winner-name"></strong> - Mã số: <strong id="winner-code"></strong></p>
-                </div>
-
-                <div id="multiple-winners-info" class="hidden">
-                    <h3>CHÚC MỪNG</h3>
-                    <p>Giải thưởng: <strong id="multi-prize-name"></strong></p>
-                    <ul id="multi-winners-list"></ul>
-                </div>
-
-            </div>
-
-            <div class="history hidden">
-                <h2>Danh sách trúng thưởng</h2>
-                <table id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Giải thưởng</th>
-                            <th>Mã số trúng thưởng</th>
-                            <th>Tên người chơi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-body"></tbody>
-                </table>
-                <button id="reset-btn" class="btn btn-secondary" style="margin-top: 1.5rem;">Cài đặt lại</button>
-            </div>
+        <div class="history hidden">
+          <h2>Danh sách trúng thưởng</h2>
+          <table id="history-table">
+            <thead>
+              <tr>
+                <th>Giải thưởng</th>
+                <th>Mã số trúng thưởng</th>
+                <th>Tên người chơi</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+          <button
+            id="reset-btn"
+            class="btn btn-secondary"
+            style="margin-top: 1.5rem"
+          >
+            Cài đặt lại
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Confirmation Modal HTML -->
     <div id="confirmation-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Xác nhận Giải thưởng</h3>
-            <p>Người chơi <strong id="modal-winner-name"></strong> với mã số <strong id="modal-winner-code"></strong> đã trúng thưởng.</p>
-            <div class="modal-buttons">
-                <button id="confirm-btn" class="btn" style="background-color: var(--success-color); color: white;">Đồng ý</button>
-                <button id="redraw-btn" class="btn" style="background-color: var(--danger-color); color: white;">Quay lại</button>
-            </div>
+      <div class="modal-content">
+        <h3>Xác nhận Giải thưởng</h3>
+        <p>
+          Người chơi <strong id="modal-winner-name"></strong> với mã số
+          <strong id="modal-winner-code"></strong> đã trúng thưởng.
+        </p>
+        <div class="modal-buttons">
+          <button
+            id="confirm-btn"
+            class="btn"
+            style="background-color: var(--success-color); color: white"
+          >
+            Đồng ý
+          </button>
+          <button
+            id="redraw-btn"
+            class="btn"
+            style="background-color: var(--danger-color); color: white"
+          >
+            Quay lại
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Custom Alert/Confirm Modal -->
     <div id="custom-alert-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="custom-alert-title">Thông báo</h3>
-            <p id="custom-alert-message"></p>
-            <div class="modal-buttons">
-                <button id="custom-alert-ok-btn" class="btn" style="background-color: var(--primary-color); color: white;">OK</button>
-            </div>
+      <div class="modal-content">
+        <h3 id="custom-alert-title">Thông báo</h3>
+        <p id="custom-alert-message"></p>
+        <div class="modal-buttons">
+          <button
+            id="custom-alert-ok-btn"
+            class="btn"
+            style="background-color: var(--primary-color); color: white"
+          >
+            OK
+          </button>
         </div>
+      </div>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         // === Vô hiệu hóa chuột phải và phím F12 ===
         // Ngăn chặn menu chuột phải
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener("contextmenu", (event) =>
+          event.preventDefault()
+        );
 
         // Ngăn chặn phím F12 và các tổ hợp phím liên quan, bao gồm Ctrl + S
-        document.addEventListener('keydown', event => {
-            if (event.key === 'F12' || 
-                (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
-                (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
-                (event.ctrlKey && event.key === 'U') || // Ctrl+U
-                ((event.ctrlKey || event.metaKey) && event.key === 's')) { // Ctrl+S hoặc Cmd+S
-                event.preventDefault();
-            }
+        document.addEventListener("keydown", (event) => {
+          if (
+            event.key === "F12" ||
+            (event.ctrlKey && event.shiftKey && event.key === "I") || // Ctrl+Shift+I
+            (event.ctrlKey && event.shiftKey && event.key === "J") || // Ctrl+Shift+J
+            (event.ctrlKey && event.key === "U") || // Ctrl+U
+            ((event.ctrlKey || event.metaKey) && event.key === "s")
+          ) {
+            // Ctrl+S hoặc Cmd+S
+            event.preventDefault();
+          }
         });
 
         // === DOM Elements ===
-        const setupView = document.getElementById('setup-view');
-        const mainView = document.getElementById('main-view');
-        const setupForm = document.getElementById('setup-form');
-        const addPrizeBtn = document.getElementById('add-prize-btn');
-        const prizesContainer = document.getElementById('prizes-container');
-        const customerFileInput = document.getElementById('customer-file');
-        const backgroundFileInput = document.getElementById('background-file');
-        const numDigitsInput = document.getElementById('num-digits');
-        const multiWinnerModeCheckbox = document.getElementById('multi-winner-mode');
-        const lotteryTitleInput = document.getElementById('lottery-title-input');
-        const lotteryTitleDisplay = document.getElementById('lottery-title-display');
-        
-        const mainLotteryInterface = document.getElementById('main-lottery-interface');
-        const historySection = document.querySelector('.history');
-        const lotteryDisplay = document.getElementById('lottery-display');
-        const prizeSelect = document.getElementById('prize-select');
-        const startBtn = document.getElementById('start-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const winnerInfo = document.getElementById('winner-info');
-        const winnerNameSpan = document.getElementById('winner-name');
-        const winnerCodeSpan = document.getElementById('winner-code');
-        const multipleWinnersInfo = document.getElementById('multiple-winners-info');
-        const multiPrizeNameSpan = document.getElementById('multi-prize-name');
-        const multiWinnersList = document.getElementById('multi-winners-list');
-        const historyBody = document.getElementById('history-body');
+        const setupView = document.getElementById("setup-view");
+        const mainView = document.getElementById("main-view");
+        const setupForm = document.getElementById("setup-form");
+        const addPrizeBtn = document.getElementById("add-prize-btn");
+        const prizesContainer = document.getElementById("prizes-container");
+        const customerFileInput = document.getElementById("customer-file");
+        const backgroundFileInput = document.getElementById("background-file");
+        const numDigitsInput = document.getElementById("num-digits");
+        const multiWinnerModeCheckbox =
+          document.getElementById("multi-winner-mode");
+        const lotteryTitleInput = document.getElementById(
+          "lottery-title-input"
+        );
+        const lotteryTitleDisplay = document.getElementById(
+          "lottery-title-display"
+        );
+
+        const mainLotteryInterface = document.getElementById(
+          "main-lottery-interface"
+        );
+        const historySection = document.querySelector(".history");
+        const lotteryDisplay = document.getElementById("lottery-display");
+        const prizeSelect = document.getElementById("prize-select");
+        const startBtn = document.getElementById("start-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const winnerInfo = document.getElementById("winner-info");
+        const winnerNameSpan = document.getElementById("winner-name");
+        const winnerCodeSpan = document.getElementById("winner-code");
+        const multipleWinnersInfo = document.getElementById(
+          "multiple-winners-info"
+        );
+        const multiPrizeNameSpan = document.getElementById("multi-prize-name");
+        const multiWinnersList = document.getElementById("multi-winners-list");
+        const historyBody = document.getElementById("history-body");
 
         // Modal Elements
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const modalWinnerName = document.getElementById('modal-winner-name');
-        const modalWinnerCode = document.getElementById('modal-winner-code');
-        const confirmBtn = document.getElementById('confirm-btn');
-        const redrawBtn = document.getElementById('redraw-btn');
-        
-        const customAlertModal = document.getElementById('custom-alert-modal');
-        const customAlertTitle = document.getElementById('custom-alert-title');
-        const customAlertMessage = document.getElementById('custom-alert-message');
-        const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
+        const confirmationModal = document.getElementById("confirmation-modal");
+        const modalWinnerName = document.getElementById("modal-winner-name");
+        const modalWinnerCode = document.getElementById("modal-winner-code");
+        const confirmBtn = document.getElementById("confirm-btn");
+        const redrawBtn = document.getElementById("redraw-btn");
+
+        const customAlertModal = document.getElementById("custom-alert-modal");
+        const customAlertTitle = document.getElementById("custom-alert-title");
+        const customAlertMessage = document.getElementById(
+          "custom-alert-message"
+        );
+        const customAlertOkBtn = document.getElementById("custom-alert-ok-btn");
 
         // === Application State ===
         let customers = [];
@@ -639,367 +737,390 @@
 
         // Custom alert and confirm replacements
         const showAlert = (message, title = "Thông báo") => {
-            customAlertTitle.textContent = title;
-            customAlertMessage.textContent = message;
-            customAlertModal.classList.add('visible');
-            return new Promise(resolve => {
-                const okBtnListener = () => {
-                    customAlertModal.classList.remove('visible');
-                    customAlertOkBtn.removeEventListener('click', okBtnListener);
-                    resolve();
-                };
-                customAlertOkBtn.addEventListener('click', okBtnListener);
-            });
+          customAlertTitle.textContent = title;
+          customAlertMessage.textContent = message;
+          customAlertModal.classList.add("visible");
+          return new Promise((resolve) => {
+            const okBtnListener = () => {
+              customAlertModal.classList.remove("visible");
+              customAlertOkBtn.removeEventListener("click", okBtnListener);
+              resolve();
+            };
+            customAlertOkBtn.addEventListener("click", okBtnListener);
+          });
         };
 
         const addPrizeRow = () => {
-            const prizeItemId = 'prize-item-' + Date.now();
-            const prizeItem = document.createElement('div');
-            prizeItem.className = 'prize-item';
-            prizeItem.id = prizeItemId;
-            prizeItem.innerHTML = `
+          const prizeItemId = "prize-item-" + Date.now();
+          const prizeItem = document.createElement("div");
+          prizeItem.className = "prize-item";
+          prizeItem.id = prizeItemId;
+          prizeItem.innerHTML = `
                 <input type="text" placeholder="Tên giải thưởng (ví dụ: Giải Nhất)" required>
                 <input type="number" placeholder="Số lượng" min="1" value="1" required>
                 <button type="button" class="remove-prize-btn" onclick="document.getElementById('${prizeItemId}').remove()">-</button>
             `;
-            prizesContainer.appendChild(prizeItem);
+          prizesContainer.appendChild(prizeItem);
         };
         addPrizeRow();
 
         const parseCSV = (data) => {
-            const rows = data.split(/\r?\n/).filter(row => row.trim() !== '');
-            if (rows.length < 2) return [];
-            const header = rows[0].split(',').map(h => h.trim().toLowerCase());
-            const codeIndex = header.indexOf('ma_so');
-            const nameIndex = header.indexOf('ten_kh');
-            if (codeIndex === -1 || nameIndex === -1) {
-                throw new Error('File CSV phải chứa cột "ma_so" và "ten_kh".');
-            }
-            return rows.slice(1).map(row => {
-                const values = row.split(',');
-                if (values.length >= header.length) {
-                    const ma_so = values[codeIndex].trim();
-                    const ten_kh = values[nameIndex].trim();
-                    if (ma_so && ten_kh) return { ma_so, ten_kh, isWinner: false };
-                }
-                return null;
-            }).filter(Boolean);
+          const rows = data.split(/\r?\n/).filter((row) => row.trim() !== "");
+          if (rows.length < 2) return [];
+          const header = rows[0].split(",").map((h) => h.trim().toLowerCase());
+          const codeIndex = header.indexOf("ma_so");
+          const nameIndex = header.indexOf("ten_kh");
+          if (codeIndex === -1 || nameIndex === -1) {
+            throw new Error('File CSV phải chứa cột "ma_so" và "ten_kh".');
+          }
+          return rows
+            .slice(1)
+            .map((row) => {
+              const values = row.split(",");
+              if (values.length >= header.length) {
+                const ma_so = values[codeIndex].trim();
+                const ten_kh = values[nameIndex].trim();
+                if (ma_so && ten_kh) return { ma_so, ten_kh, isWinner: false };
+              }
+              return null;
+            })
+            .filter(Boolean);
         };
 
         const initializeApp = () => {
-            lotteryDisplay.innerHTML = '';
-            for (let i = 0; i < numDigits; i++) {
-                const digitBox = document.createElement('div');
-                digitBox.className = 'digit-box';
-                digitBox.textContent = '-';
-                lotteryDisplay.appendChild(digitBox);
-            }
-            updatePrizeSelect();
-            historyBody.innerHTML = '';
-            winners = [];
-            winnerInfo.style.display = 'none';
-            multipleWinnersInfo.style.display = 'none';
-            startBtn.disabled = false;
-            
-            mainLotteryInterface.classList.remove('hidden');
-            historySection.classList.add('hidden');
+          lotteryDisplay.innerHTML = "";
+          for (let i = 0; i < numDigits; i++) {
+            const digitBox = document.createElement("div");
+            digitBox.className = "digit-box";
+            digitBox.textContent = "-";
+            lotteryDisplay.appendChild(digitBox);
+          }
+          updatePrizeSelect();
+          historyBody.innerHTML = "";
+          winners = [];
+          winnerInfo.style.display = "none";
+          multipleWinnersInfo.style.display = "none";
+          startBtn.disabled = false;
+
+          mainLotteryInterface.classList.remove("hidden");
+          historySection.classList.add("hidden");
         };
 
         const updatePrizeSelect = () => {
-            prizeSelect.innerHTML = '';
-            let hasAvailablePrizes = false;
-            prizes.forEach((prize, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${prize.name} (Còn lại: ${prize.remaining}/${prize.quantity})`;
-                if (prize.remaining === 0) {
-                    option.disabled = true;
-                    option.style.color = '#999';
-                } else {
-                    hasAvailablePrizes = true;
-                }
-                prizeSelect.appendChild(option);
-            });
-            startBtn.disabled = !hasAvailablePrizes;
-            if (!hasAvailablePrizes) {
-                startBtn.textContent = "HẾT GIẢI";
+          prizeSelect.innerHTML = "";
+          let hasAvailablePrizes = false;
+          prizes.forEach((prize, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = `${prize.name} (Còn lại: ${prize.remaining}/${prize.quantity})`;
+            if (prize.remaining === 0) {
+              option.disabled = true;
+              option.style.color = "#999";
             } else {
-                startBtn.textContent = "QUAY SỐ";
+              hasAvailablePrizes = true;
             }
+            prizeSelect.appendChild(option);
+          });
+          startBtn.disabled = !hasAvailablePrizes;
+          if (!hasAvailablePrizes) {
+            startBtn.textContent = "HẾT GIẢI";
+          } else {
+            startBtn.textContent = "QUAY SỐ";
+          }
         };
-        
+
         // Reset the lottery display for the next draw
         const resetLotteryDisplay = () => {
-            const digitBoxes = lotteryDisplay.children;
-            for(const box of digitBoxes) {
-                box.classList.remove('stopped');
-                box.textContent = '-';
-            }
+          const digitBoxes = lotteryDisplay.children;
+          for (const box of digitBoxes) {
+            box.classList.remove("stopped");
+            box.textContent = "-";
+          }
         };
 
         // Cập nhật giao diện sau khi có một người trúng giải
         const finalizeSingleWinner = (winner, prize) => {
-            winnerNameSpan.textContent = winner.ten_kh;
-            winnerCodeSpan.textContent = winner.ma_so;
-            winnerInfo.style.display = 'block';
-            winnerInfo.classList.remove('hidden');
-            
-            // Thêm người trúng vào lịch sử
-            const historyRow = document.createElement('tr');
-            historyRow.innerHTML = `
+          winnerNameSpan.textContent = winner.ten_kh;
+          winnerCodeSpan.textContent = winner.ma_so;
+          winnerInfo.style.display = "block";
+          winnerInfo.classList.remove("hidden");
+
+          // Thêm người trúng vào lịch sử
+          const historyRow = document.createElement("tr");
+          historyRow.innerHTML = `
                 <td>${prize.name}</td>
                 <td>${winner.ma_so}</td>
                 <td>${winner.ten_kh}</td>
             `;
-            historyBody.prepend(historyRow);
-            winners.push({ ...winner, prizeName: prize.name });
-            
-            updatePrizeSelect();
-            prizeSelect.disabled = false;
-            startBtn.disabled = false;
+          historyBody.prepend(historyRow);
+          winners.push({ ...winner, prizeName: prize.name });
+
+          updatePrizeSelect();
+          prizeSelect.disabled = false;
+          startBtn.disabled = false;
         };
-        
+
         // Thêm người trúng vào danh sách hiển thị nhiều người và lịch sử
         const addWinnerToMultiList = (winner, prize) => {
-            const li = document.createElement('li');
-            li.innerHTML = `<strong>${winner.ten_kh}</strong> - Mã số: ${winner.ma_so}`;
-            multiWinnersList.appendChild(li);
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${winner.ten_kh}</strong> - Mã số: ${winner.ma_so}`;
+          multiWinnersList.appendChild(li);
 
-            const historyRow = document.createElement('tr');
-            historyRow.innerHTML = `
+          const historyRow = document.createElement("tr");
+          historyRow.innerHTML = `
                 <td>${prize.name}</td>
                 <td>${winner.ma_so}</td>
                 <td>${winner.ten_kh}</td>
             `;
-            historyBody.prepend(historyRow);
-            winners.push({ ...winner, prizeName: prize.name });
+          historyBody.prepend(historyRow);
+          winners.push({ ...winner, prizeName: prize.name });
         };
-        
+
         const showConfirmationModal = (winner) => {
-            modalWinnerName.textContent = winner.ten_kh;
-            modalWinnerCode.textContent = winner.ma_so;
-            confirmationModal.classList.add('visible');
+          modalWinnerName.textContent = winner.ten_kh;
+          modalWinnerCode.textContent = winner.ma_so;
+          confirmationModal.classList.add("visible");
         };
-        
+
         const hideConfirmationModal = () => {
-            confirmationModal.classList.remove('visible');
+          confirmationModal.classList.remove("visible");
         };
 
         const stopDigitsSequentially = (winnerCode) => {
-            return new Promise(resolve => {
-                const digitBoxes = lotteryDisplay.children;
-                const paddedWinnerCode = winnerCode.toUpperCase().padStart(numDigits, ' ');
-                let interval;
-                let i = 0;
-                
-                // Dừng từng ô số một
-                const stopNextDigit = () => {
-                    if (i < numDigits) {
-                        const box = digitBoxes[i];
-                        box.classList.add('stopped');
-                        box.textContent = paddedWinnerCode[i] || ' ';
-                        i++;
-                        setTimeout(stopNextDigit, 500); // Tăng thời gian dừng để tạo hiệu ứng tốt hơn
-                    } else {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                };
+          return new Promise((resolve) => {
+            const digitBoxes = lotteryDisplay.children;
+            const paddedWinnerCode = winnerCode
+              .toUpperCase()
+              .padStart(numDigits, " ");
+            let interval;
+            let i = 0;
 
-                // Chạy hiệu ứng quay số
-                interval = setInterval(() => {
-                    for (let j = 0; j < numDigits; j++) {
-                        if (!digitBoxes[j].classList.contains('stopped')) {
-                            const alphanumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                            const randomIndex = Math.floor(Math.random() * alphanumericChars.length);
-                            digitBoxes[j].textContent = alphanumericChars[randomIndex];
-                        }
-                    }
-                }, 100);
+            // Dừng từng ô số một
+            const stopNextDigit = () => {
+              if (i < numDigits) {
+                const box = digitBoxes[i];
+                box.classList.add("stopped");
+                box.textContent = paddedWinnerCode[i] || " ";
+                i++;
+                setTimeout(stopNextDigit, 500); // Tăng thời gian dừng để tạo hiệu ứng tốt hơn
+              } else {
+                clearInterval(interval);
+                resolve();
+              }
+            };
 
-                stopNextDigit();
-            });
+            // Chạy hiệu ứng quay số
+            interval = setInterval(() => {
+              for (let j = 0; j < numDigits; j++) {
+                if (!digitBoxes[j].classList.contains("stopped")) {
+                  const alphanumericChars =
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                  const randomIndex = Math.floor(
+                    Math.random() * alphanumericChars.length
+                  );
+                  digitBoxes[j].textContent = alphanumericChars[randomIndex];
+                }
+              }
+            }, 100);
+
+            stopNextDigit();
+          });
         };
-        
+
         // Hộp thoại xác nhận cho chế độ 1 người trúng
         const runSingleWinnerLotterySequence = (winner, prize) => {
-            startBtn.disabled = true;
-            prizeSelect.disabled = true;
-            winnerInfo.style.display = 'none';
-            multipleWinnersInfo.style.display = 'none';
+          startBtn.disabled = true;
+          prizeSelect.disabled = true;
+          winnerInfo.style.display = "none";
+          multipleWinnersInfo.style.display = "none";
 
-            // Reset the display before running the animation
-            resetLotteryDisplay();
-            
-            stopDigitsSequentially(winner.ma_so)
-                .then(() => {
-                    showConfirmationModal(winner);
-                    tempWinner = winner;
-                    tempPrize = prize;
-                });
+          // Reset the display before running the animation
+          resetLotteryDisplay();
+
+          stopDigitsSequentially(winner.ma_so).then(() => {
+            showConfirmationModal(winner);
+            tempWinner = winner;
+            tempPrize = prize;
+          });
         };
-        
+
         // Logic quay số cho nhiều người
         const runMultiWinnerLottery = async (prize) => {
-            startBtn.disabled = true;
-            prizeSelect.disabled = true;
-            winnerInfo.style.display = 'none';
-            
-            const availableCustomers = customers.filter(c => !c.isWinner);
-            if (availableCustomers.length < prize.remaining) {
-                showAlert(`Không đủ người chơi để quay giải này. Còn ${prize.remaining} giải thưởng nhưng chỉ còn ${availableCustomers.length} người.`);
-                startBtn.disabled = false;
-                prizeSelect.disabled = false;
-                return;
-            }
+          startBtn.disabled = true;
+          prizeSelect.disabled = true;
+          winnerInfo.style.display = "none";
 
-            multipleWinnersInfo.style.display = 'block';
-            multiPrizeNameSpan.textContent = prize.name;
-            multiWinnersList.innerHTML = '';
-            
-            for (let i = 0; i < prize.remaining; i++) {
-                const winnerIndex = Math.floor(Math.random() * availableCustomers.length);
-                const winner = availableCustomers.splice(winnerIndex, 1)[0];
-                winner.isWinner = true; // Mark as winner
-                
-                await stopDigitsSequentially(winner.ma_so);
-                
-                // Hiển thị người trúng hiện tại
-                winnerInfo.classList.remove('hidden');
-                winnerNameSpan.textContent = winner.ten_kh;
-                winnerCodeSpan.textContent = winner.ma_so;
-                
-                // Thêm người trúng vào danh sách và lịch sử
-                addWinnerToMultiList(winner, prize);
-                
-                // Chờ một chút trước khi quay người tiếp theo
-                if (i < prize.remaining - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    // Xóa hiệu ứng đã dừng để chuẩn bị cho lượt quay mới
-                    resetLotteryDisplay();
-                    winnerInfo.classList.add('hidden');
-                }
-            }
-            
-            prize.remaining = 0;
-            updatePrizeSelect();
+          const availableCustomers = customers.filter((c) => !c.isWinner);
+          if (availableCustomers.length < prize.remaining) {
+            showAlert(
+              `Không đủ người chơi để quay giải này. Còn ${prize.remaining} giải thưởng nhưng chỉ còn ${availableCustomers.length} người.`
+            );
             startBtn.disabled = false;
             prizeSelect.disabled = false;
+            return;
+          }
+
+          multipleWinnersInfo.style.display = "block";
+          multiPrizeNameSpan.textContent = prize.name;
+          multiWinnersList.innerHTML = "";
+
+          for (let i = 0; i < prize.remaining; i++) {
+            const winnerIndex = Math.floor(
+              Math.random() * availableCustomers.length
+            );
+            const winner = availableCustomers.splice(winnerIndex, 1)[0];
+            winner.isWinner = true; // Mark as winner
+
+            await stopDigitsSequentially(winner.ma_so);
+
+            // Hiển thị người trúng hiện tại
+            winnerInfo.classList.remove("hidden");
+            winnerNameSpan.textContent = winner.ten_kh;
+            winnerCodeSpan.textContent = winner.ma_so;
+
+            // Thêm người trúng vào danh sách và lịch sử
+            addWinnerToMultiList(winner, prize);
+
+            // Chờ một chút trước khi quay người tiếp theo
+            if (i < prize.remaining - 1) {
+              await new Promise((resolve) => setTimeout(resolve, 2000));
+              // Xóa hiệu ứng đã dừng để chuẩn bị cho lượt quay mới
+              resetLotteryDisplay();
+              winnerInfo.classList.add("hidden");
+            }
+          }
+
+          prize.remaining = 0;
+          updatePrizeSelect();
+          startBtn.disabled = false;
+          prizeSelect.disabled = false;
         };
 
         // === Event Listeners ===
-        addPrizeBtn.addEventListener('click', addPrizeRow);
+        addPrizeBtn.addEventListener("click", addPrizeRow);
 
-        setupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const lotteryTitle = lotteryTitleInput.value.trim() || 'Lucky Draw';
-            lotteryTitleDisplay.textContent = lotteryTitle;
+        setupForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            // Handle Background Image
-            const bgFile = backgroundFileInput.files[0];
-            if (bgFile) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.body.style.backgroundImage = `url('${event.target.result}')`;
-                    document.body.style.backgroundSize = 'cover';
-                    document.body.style.backgroundPosition = 'center';
-                    document.body.style.backgroundAttachment = 'fixed';
-                    document.body.classList.add('custom-bg');
-                }
-                reader.readAsDataURL(bgFile);
-            }
+          const lotteryTitle = lotteryTitleInput.value.trim() || "Lucky Draw";
+          lotteryTitleDisplay.textContent = lotteryTitle;
 
-            // Handle CSV File
-            const file = customerFileInput.files[0];
-            if (!file) {
-                await showAlert('Vui lòng chọn file người chơi!');
-                return;
-            }
+          // Handle Background Image
+          const bgFile = backgroundFileInput.files[0];
+          if (bgFile) {
             const reader = new FileReader();
-            reader.onload = async (event) => {
-                try {
-                    customers = parseCSV(event.target.result);
-                    if (customers.length === 0) {
-                        await showAlert('Dữ liệu người chơi trong file CSV không hợp lệ hoặc rỗng.');
-                        return;
-                    }
-                    prizes = [];
-                    prizesContainer.querySelectorAll('.prize-item').forEach(item => {
-                        const name = item.querySelector('input[type="text"]').value.trim();
-                        const quantity = parseInt(item.querySelector('input[type="number"]').value);
-                        if (name && quantity > 0) {
-                            prizes.push({ name, quantity, remaining: quantity });
-                        }
-                    });
-                    if (prizes.length === 0) {
-                        await showAlert('Vui lòng nhập ít nhất một giải thưởng.');
-                        return;
-                    }
-                    numDigits = parseInt(numDigitsInput.value);
-                    isMultiWinnerMode = multiWinnerModeCheckbox.checked;
-                    initializeApp();
-                    setupView.classList.add('hidden');
-                    mainView.classList.remove('hidden');
-                } catch (error) {
-                    await showAlert('Lỗi đọc file CSV: ' + error.message);
-                }
+            reader.onload = function (event) {
+              document.body.style.backgroundImage = `url('${event.target.result}')`;
+              document.body.style.backgroundSize = "cover";
+              document.body.style.backgroundPosition = "center";
+              document.body.style.backgroundAttachment = "fixed";
+              document.body.classList.add("custom-bg");
             };
-            reader.onerror = () => showAlert('Không thể đọc file đã chọn!');
-            reader.readAsText(file, 'UTF-8');
-        });
+            reader.readAsDataURL(bgFile);
+          }
 
-        startBtn.addEventListener('click', () => {
-            if (startBtn.disabled) return;
-            const selectedPrizeIndex = prizeSelect.value;
-            if (selectedPrizeIndex === "" || !prizes[selectedPrizeIndex]) return;
-            const prize = prizes[selectedPrizeIndex];
-            if (prize.remaining <= 0) return;
-
-            const availableCustomers = customers.filter(c => !c.isWinner);
-            if (availableCustomers.length === 0) {
-                showAlert("Tất cả người chơi đã trúng thưởng!");
-                startBtn.disabled = true;
+          // Handle CSV File
+          const file = customerFileInput.files[0];
+          if (!file) {
+            await showAlert("Vui lòng chọn file người chơi!");
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              customers = parseCSV(event.target.result);
+              if (customers.length === 0) {
+                await showAlert(
+                  "Dữ liệu người chơi trong file CSV không hợp lệ hoặc rỗng."
+                );
                 return;
+              }
+              prizes = [];
+              prizesContainer
+                .querySelectorAll(".prize-item")
+                .forEach((item) => {
+                  const name = item
+                    .querySelector('input[type="text"]')
+                    .value.trim();
+                  const quantity = parseInt(
+                    item.querySelector('input[type="number"]').value
+                  );
+                  if (name && quantity > 0) {
+                    prizes.push({ name, quantity, remaining: quantity });
+                  }
+                });
+              if (prizes.length === 0) {
+                await showAlert("Vui lòng nhập ít nhất một giải thưởng.");
+                return;
+              }
+              numDigits = parseInt(numDigitsInput.value);
+              isMultiWinnerMode = multiWinnerModeCheckbox.checked;
+              initializeApp();
+              setupView.classList.add("hidden");
+              mainView.classList.remove("hidden");
+            } catch (error) {
+              await showAlert("Lỗi đọc file CSV: " + error.message);
             }
-            
-            if (isMultiWinnerMode) {
-                runMultiWinnerLottery(prize);
-            } else {
-                const winnerIndex = Math.floor(Math.random() * availableCustomers.length);
-                tempWinner = availableCustomers[winnerIndex];
-                tempPrize = prize;
-                runSingleWinnerLotterySequence(tempWinner, tempPrize);
-            }
+          };
+          reader.onerror = () => showAlert("Không thể đọc file đã chọn!");
+          reader.readAsText(file, "UTF-8");
         });
 
-        confirmBtn.addEventListener('click', () => {
-            if (!tempWinner || !tempPrize) return;
-            const originalCustomer = customers.find(c => c.ma_so === tempWinner.ma_so);
-            originalCustomer.isWinner = true;
-            tempPrize.remaining--;
-            finalizeSingleWinner(tempWinner, tempPrize);
-            hideConfirmationModal();
-            tempWinner = null;
-            tempPrize = null;
+        startBtn.addEventListener("click", () => {
+          if (startBtn.disabled) return;
+          const selectedPrizeIndex = prizeSelect.value;
+          if (selectedPrizeIndex === "" || !prizes[selectedPrizeIndex]) return;
+          const prize = prizes[selectedPrizeIndex];
+          if (prize.remaining <= 0) return;
+
+          const availableCustomers = customers.filter((c) => !c.isWinner);
+          if (availableCustomers.length === 0) {
+            showAlert("Tất cả người chơi đã trúng thưởng!");
+            startBtn.disabled = true;
+            return;
+          }
+
+          if (isMultiWinnerMode) {
+            runMultiWinnerLottery(prize);
+          } else {
+            const winnerIndex = Math.floor(
+              Math.random() * availableCustomers.length
+            );
+            tempWinner = availableCustomers[winnerIndex];
+            tempPrize = prize;
+            runSingleWinnerLotterySequence(tempWinner, tempPrize);
+          }
         });
 
-        redrawBtn.addEventListener('click', () => {
-            if (!tempWinner) return;
-            hideConfirmationModal();
-            resetLotteryDisplay();
-            prizeSelect.disabled = false;
-            startBtn.disabled = false;
-            updatePrizeSelect();
-            tempWinner = null;
-            tempPrize = null;
+        confirmBtn.addEventListener("click", () => {
+          if (!tempWinner || !tempPrize) return;
+          const originalCustomer = customers.find(
+            (c) => c.ma_so === tempWinner.ma_so
+          );
+          originalCustomer.isWinner = true;
+          tempPrize.remaining--;
+          finalizeSingleWinner(tempWinner, tempPrize);
+          hideConfirmationModal();
+          tempWinner = null;
+          tempPrize = null;
         });
 
-        resetBtn.addEventListener('click', async () => {
-             const confirmed = await new Promise(resolve => {
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay visible';
-                modal.innerHTML = `
+        redrawBtn.addEventListener("click", () => {
+          if (!tempWinner) return;
+          hideConfirmationModal();
+          resetLotteryDisplay();
+          prizeSelect.disabled = false;
+          startBtn.disabled = false;
+          updatePrizeSelect();
+          tempWinner = null;
+          tempPrize = null;
+        });
+
+        resetBtn.addEventListener("click", async () => {
+          const confirmed = await new Promise((resolve) => {
+            const modal = document.createElement("div");
+            modal.className = "modal-overlay visible";
+            modal.innerHTML = `
                     <div class="modal-content">
                         <h3>Cài đặt lại</h3>
                         <p>Bạn có chắc muốn cài đặt lại? Mọi dữ liệu sẽ bị mất.</p>
@@ -1009,32 +1130,35 @@
                         </div>
                     </div>
                 `;
-                document.body.appendChild(modal);
+            document.body.appendChild(modal);
 
-                document.getElementById('modal-confirm-yes').addEventListener('click', () => {
-                    document.body.removeChild(modal);
-                    resolve(true);
-                });
-                document.getElementById('modal-confirm-no').addEventListener('click', () => {
-                    document.body.removeChild(modal);
-                    resolve(false);
-                });
-             });
-            if (confirmed) {
-                location.reload();
-            }
+            document
+              .getElementById("modal-confirm-yes")
+              .addEventListener("click", () => {
+                document.body.removeChild(modal);
+                resolve(true);
+              });
+            document
+              .getElementById("modal-confirm-no")
+              .addEventListener("click", () => {
+                document.body.removeChild(modal);
+                resolve(false);
+              });
+          });
+          if (confirmed) {
+            location.reload();
+          }
         });
-        
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'F1' && !mainView.classList.contains('hidden')) {
-                event.preventDefault(); 
-                
-                mainLotteryInterface.classList.toggle('hidden');
-                historySection.classList.toggle('hidden');
-            }
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "F1" && !mainView.classList.contains("hidden")) {
+            event.preventDefault();
+
+            mainLotteryInterface.classList.toggle("hidden");
+            historySection.classList.toggle("hidden");
+          }
         });
-    });
+      });
     </script>
-</body>
+  </body>
 </html>
-```
