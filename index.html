@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuckyDraw #Vinh</title>
+    <title>Chương trình Lucky Draw</title>
     <style>
         /* CSS Styles */
         :root {
@@ -465,6 +465,11 @@
             <h1>Cài đặt Lucky Draw</h1>
             <form id="setup-form">
                 <div class="form-group">
+                    <label for="lottery-title-input">Tên chương trình Lucky Draw:</label>
+                    <input type="text" id="lottery-title-input" placeholder="Nhập tên chương trình (mặc định: Lucky Draw)">
+                </div>
+                
+                <div class="form-group">
                     <label for="num-digits">Số lượng ký tự mã số (1-10):</label>
                     <input type="number" id="num-digits" value="6" min="1" max="10" required>
                 </div>
@@ -501,7 +506,7 @@
         <div id="main-view" class="hidden">
             
             <div id="main-lottery-interface">
-                <h1>Lucky Draw</h1>
+                <h1 id="lottery-title-display">Lucky Draw</h1>
                 <div id="lottery-display">
                     <!-- Các ô số sẽ được tạo bằng JavaScript -->
                 </div>
@@ -591,6 +596,8 @@
         const backgroundFileInput = document.getElementById('background-file');
         const numDigitsInput = document.getElementById('num-digits');
         const multiWinnerModeCheckbox = document.getElementById('multi-winner-mode');
+        const lotteryTitleInput = document.getElementById('lottery-title-input');
+        const lotteryTitleDisplay = document.getElementById('lottery-title-display');
         
         const mainLotteryInterface = document.getElementById('main-lottery-interface');
         const historySection = document.querySelector('.history');
@@ -721,6 +728,15 @@
             }
         };
         
+        // Reset the lottery display for the next draw
+        const resetLotteryDisplay = () => {
+            const digitBoxes = lotteryDisplay.children;
+            for(const box of digitBoxes) {
+                box.classList.remove('stopped');
+                box.textContent = '-';
+            }
+        };
+
         // Cập nhật giao diện sau khi có một người trúng giải
         const finalizeSingleWinner = (winner, prize) => {
             winnerNameSpan.textContent = winner.ten_kh;
@@ -812,6 +828,9 @@
             winnerInfo.style.display = 'none';
             multipleWinnersInfo.style.display = 'none';
 
+            // Reset the display before running the animation
+            resetLotteryDisplay();
+            
             stopDigitsSequentially(winner.ma_so)
                 .then(() => {
                     showConfirmationModal(winner);
@@ -857,10 +876,7 @@
                 if (i < prize.remaining - 1) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     // Xóa hiệu ứng đã dừng để chuẩn bị cho lượt quay mới
-                    for(const box of lotteryDisplay.children) {
-                        box.classList.remove('stopped');
-                        box.textContent = '-';
-                    }
+                    resetLotteryDisplay();
                     winnerInfo.classList.add('hidden');
                 }
             }
@@ -877,6 +893,9 @@
         setupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const lotteryTitle = lotteryTitleInput.value.trim() || 'Lucky Draw';
+            lotteryTitleDisplay.textContent = lotteryTitle;
+
             // Handle Background Image
             const bgFile = backgroundFileInput.files[0];
             if (bgFile) {
@@ -968,11 +987,7 @@
         redrawBtn.addEventListener('click', () => {
             if (!tempWinner) return;
             hideConfirmationModal();
-            const digitBoxes = lotteryDisplay.children;
-            for(const box of digitBoxes) {
-                box.classList.remove('stopped');
-                box.textContent = '-';
-            }
+            resetLotteryDisplay();
             prizeSelect.disabled = false;
             startBtn.disabled = false;
             updatePrizeSelect();
@@ -1022,3 +1037,4 @@
     </script>
 </body>
 </html>
+```
