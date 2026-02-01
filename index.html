@@ -3,603 +3,589 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chương trình Lucky Draw</title>
+    <title>Dev by VinhHP2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00f2ff",
+              secondary: "#7000ff",
+              accent: "#ff0055",
+              dark: "#050510",
+              glass: "rgba(20, 20, 35, 0.6)",
+              "glass-border": "rgba(255, 255, 255, 0.1)",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["Orbitron", "monospace"],
+            },
+            animation: {
+              "spin-slow": "spin 3s linear infinite",
+              "fade-in": "fadeIn 0.3s ease-out",
+              "zoom-in": "zoomIn 0.5s ease-out",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              zoomIn: {
+                "0%": { opacity: "0", transform: "scale(0.8)" },
+                "100%": { opacity: "1", transform: "scale(1)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
     <style>
-      /* CSS Styles */
       :root {
-        --primary-color: #0d6efd;
-        --secondary-color: #6c757d;
-        --success-color: #198754;
-        --danger-color: #dc3545;
-        --light-color: #f8f9fa;
-        --dark-color: #212529;
-        --border-color: #dee2e6;
-        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
+        --panel-alpha: 0.6;
+        --panel-blur: 10px;
       }
 
       body {
-        font-family: var(--font-family);
-        background-color: #f0f2f5;
-        color: var(--dark-color);
+        background-color: #050510;
+        background-image: radial-gradient(
+            circle at 15% 50%,
+            rgba(112, 0, 255, 0.15),
+            transparent 25%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(0, 242, 255, 0.15),
+            transparent 25%
+          );
+        background-attachment: fixed;
+        background-size: cover;
+        color: #e2e8f0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        transition: background 0.5s ease;
+      }
+
+      /* 3D Cube Styles */
+      .scene {
+        perspective: 1000px;
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        padding: 2rem;
-        box-sizing: border-box;
-        transition: background-image 0.5s ease-in-out;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding: 2rem 0;
       }
 
-      .container {
-        background-color: white;
-        padding: 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 850px;
-        transition: all 0.3s ease-in-out;
+      .cube-container {
+        width: 80px;
+        height: 110px;
         position: relative;
       }
 
-      body.custom-bg .container {
-        background-color: transparent;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        box-shadow: none;
-        border: none;
+      .cube {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transform: translateZ(-50px);
+        transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      h1,
-      h2 {
-        text-align: center;
-        color: var(--primary-color);
-        margin-bottom: 1.5rem;
+      /* Animation xoay */
+      .cube.spinning {
+        animation-name: spinCube;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
       }
 
-      h2 {
-        color: var(--dark-color);
-        border-bottom: 2px solid var(--border-color);
-        padding-bottom: 0.5rem;
-        margin-top: 2rem;
+      @keyframes spinCube {
+        0% {
+          transform: rotateX(0deg);
+        }
+        100% {
+          transform: rotateX(-360deg);
+        }
       }
 
-      body.custom-bg h1,
-      body.custom-bg h2,
-      body.custom-bg label,
-      body.custom-bg small {
+      .cube-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Orbitron", monospace;
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: rgba(30, 30, 50, 0.95);
+        border: 1px solid rgba(0, 242, 255, 0.3);
+        box-shadow: 0 0 10px rgba(0, 242, 255, 0.1) inset;
+        border-radius: 8px;
+        color: #fff;
+        backface-visibility: hidden;
+      }
+
+      .cube-face-front {
+        transform: rotateY(0deg) translateZ(55px);
+      }
+      .cube-face-top {
+        transform: rotateX(90deg) translateZ(55px);
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 242, 255, 0.2),
+          rgba(112, 0, 255, 0.2)
+        );
+        filter: blur(2px);
+      }
+      .cube-face-bottom {
+        transform: rotateX(-90deg) translateZ(55px);
+        filter: blur(2px);
+      }
+      .cube-face-back {
+        transform: rotateY(180deg) translateZ(55px);
+        opacity: 0;
+      }
+
+      .cube-face-front.highlight {
+        border-color: #ff0055;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+        color: #ff0055;
+      }
+
+      .glass-panel {
+        background: rgba(20, 20, 35, var(--panel-alpha));
+        backdrop-filter: blur(var(--panel-blur));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="file"],
+      select,
+      textarea {
+        background-color: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        outline: none;
+        transition: all 0.3s;
+      }
+      input:focus,
+      select:focus {
+        border-color: #00f2ff;
+        box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2);
       }
 
-      body.custom-bg h2 {
-        border-bottom-color: rgba(255, 255, 255, 0.5);
+      .btn-neon {
+        background: linear-gradient(90deg, #00f2ff, #00aaff);
+        color: #000;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+        transition: all 0.3s;
+      }
+      .btn-neon:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+      }
+      .btn-neon:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(1);
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f0f1a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #00f2ff;
+      }
+
+      @media (max-width: 768px) {
+        .cube-container {
+          width: 45px;
+          height: 65px;
+        }
+        .cube-face {
+          font-size: 2rem;
+        }
+        .cube-face-front,
+        .cube-face-top,
+        .cube-face-bottom {
+          transform: translateZ(32px) rotateX(var(--rx, 0))
+            rotateY(var(--ry, 0));
+        }
+        .cube-face-top {
+          --rx: 90deg;
+        }
+        .cube-face-bottom {
+          --rx: -90deg;
+        }
+        .cube-face-front {
+          --rx: 0deg;
+        }
       }
 
       .hidden {
-        display: none;
-      }
-
-      /* Giao diện Cài đặt */
-      .form-group {
-        margin-bottom: 1.5rem;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-      }
-
-      .form-group input[type="number"],
-      .form-group input[type="text"],
-      .form-group input[type="file"],
-      select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        box-sizing: border-box;
-        font-size: 1rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-
-      .form-group input:focus,
-      select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-      }
-
-      .prize-item {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 0.75rem;
-        align-items: center;
-      }
-
-      .prize-item input[type="text"] {
-        flex-grow: 1;
-      }
-
-      .prize-item input[type="number"] {
-        width: 120px;
-        flex-shrink: 0;
-      }
-
-      .prize-item .remove-prize-btn {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1rem;
-        line-height: 30px;
-        text-align: center;
-        flex-shrink: 0;
-      }
-
-      .btn,
-      .btn-primary,
-      .btn-secondary,
-      .btn-tertiary {
-        display: inline-block;
-        padding: 0.8rem 1.5rem;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-align: center;
-        transition: all 0.2s ease;
-      }
-
-      .btn:active,
-      .btn-primary:active,
-      .btn-secondary:active {
-        transform: scale(0.97);
-      }
-
-      .btn-tertiary {
-        background: none;
-        border: 2px dashed var(--secondary-color);
-        color: var(--secondary-color);
-        width: 100%;
-      }
-      .btn-tertiary:hover {
-        background-color: #f8f9fa;
-      }
-
-      body.custom-bg .btn-tertiary {
-        border-color: rgba(255, 255, 255, 0.7);
-        color: white;
-      }
-
-      .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-        width: 100%;
-        margin-top: 1.5rem;
-        font-size: 1.2rem;
-        padding: 1rem;
-      }
-      .btn-primary:hover {
-        background-color: #0b5ed7;
-      }
-
-      .btn-secondary {
-        background-color: var(--secondary-color);
-        color: white;
-      }
-      .btn-secondary:hover {
-        background-color: #5c636a;
-      }
-
-      #main-view {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-      }
-      #main-view:not(.hidden) {
-        display: flex;
-      }
-
-      #main-lottery-interface,
-      .history {
-        width: 100%;
-      }
-
-      #lottery-display {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin: 2.5rem 0;
-      }
-
-      .digit-box {
-        width: 70px;
-        height: 90px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 3.5rem;
-        font-weight: bold;
-        background-image: linear-gradient(180deg, #ffffff, #f1f1f1);
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        color: var(--dark-color);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
-          inset 0 1px 3px rgba(255, 255, 255, 0.7);
-        text-shadow: 0 1px 1px white;
-        transition: all 0.3s ease;
-      }
-
-      body.custom-bg .digit-box {
-        background-color: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.3);
-        color: white;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-      }
-
-      .digit-box.stopped {
-        border-color: var(--danger-color);
-        color: var(--danger-color);
-        background-image: linear-gradient(180deg, #f8f9fa, #e9ecef);
-        transform: scale(1.05);
-      }
-
-      body.custom-bg .digit-box.stopped {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 82, 82, 0.8);
-        color: #ff5252;
-        text-shadow: 0 0 5px white, 0 0 10px white;
-      }
-
-      .controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-
-      .controls select {
-        width: auto;
-        flex-grow: 1;
-        max-width: 400px;
-      }
-
-      #start-btn {
-        background-color: var(--success-color);
-        color: white;
-      }
-      #start-btn:hover {
-        background-color: #157347;
-      }
-      #start-btn:disabled {
-        background-color: #aaa;
-        cursor: not-allowed;
-      }
-
-      #winner-info,
-      #multiple-winners-info {
-        text-align: center;
-        margin: 2rem 0;
-        padding: 1.5rem;
-        background-color: #d1e7dd;
-        border-left: 7px solid var(--success-color);
-        border-radius: 8px;
-        display: none; /* Ẩn ban đầu */
-        animation: fadeIn 0.5s ease;
-      }
-
-      body.custom-bg #winner-info,
-      body.custom-bg #multiple-winners-info {
-        background-color: rgba(25, 135, 84, 0.7);
-        color: white;
-        border-left-color: #fff;
-      }
-
-      #winner-info h3,
-      #multiple-winners-info h3 {
-        color: var(--success-color);
-        margin: 0;
-        font-size: 1.5rem;
-      }
-
-      body.custom-bg #winner-info h3,
-      body.custom-bg #winner-info p,
-      body.custom-bg #multiple-winners-info h3,
-      body.custom-bg #multiple-winners-info p {
-        color: white;
-      }
-
-      #winner-info p {
-        margin: 0.5rem 0 0;
-        font-size: 1.1rem;
-      }
-
-      #multiple-winners-info ul {
-        list-style: none;
-        padding: 0;
-        margin: 1rem 0;
-        text-align: left;
-        display: inline-block;
-      }
-
-      #multiple-winners-info li {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .history {
-        text-align: center;
-      }
-
-      body.custom-bg .history {
-        background-color: rgba(255, 255, 255, 0.95);
-        padding: 1.5rem 2.5rem 2.5rem 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-      }
-
-      body.custom-bg .history h2 {
-        color: var(--dark-color);
-        text-shadow: none;
-        border-bottom-color: var(--border-color);
-      }
-
-      #history-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-      }
-
-      #history-table th,
-      #history-table td {
-        border: 1px solid var(--border-color);
-        padding: 0.8rem 1rem;
-        text-align: center;
-      }
-
-      #history-table th {
-        background-color: var(--light-color);
-        font-weight: 600;
-      }
-
-      body.custom-bg .history #history-table th {
-        color: var(--dark-color);
-        text-shadow: none;
-      }
-
-      body.custom-bg .history #history-table td {
-        color: var(--dark-color);
-        text-shadow: none;
-      }
-
-      #history-table tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
-      }
-
-      body.custom-bg .history #history-table tbody tr:nth-child(even) {
-        background-color: #f0f2f5;
-      }
-      body.custom-bg .history #history-table tbody tr:nth-child(odd) {
-        background-color: white;
-      }
-
-      /* Confirmation Modal */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s, visibility 0.3s;
-      }
-      .modal-overlay.visible {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .modal-content {
-        background: white;
-        padding: 2rem 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        width: 90%;
-        max-width: 500px;
-        transform: scale(0.9);
-        transition: transform 0.3s;
-      }
-
-      body.custom-bg .modal-content {
-        background-color: rgba(40, 40, 40, 0.85);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
-      .modal-content h3 {
-        margin-top: 0;
-        color: var(--primary-color);
-      }
-
-      .modal-content p {
-        margin: 1rem 0;
-        font-size: 1.1rem;
-      }
-
-      body.custom-bg .modal-content h3,
-      body.custom-bg .modal-content p {
-        color: white;
-      }
-
-      .modal-buttons {
-        margin-top: 2rem;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-      }
-
-      .checkbox-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: -1rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-        gap: 0.5rem;
-      }
-
-      .checkbox-container input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
+        display: none !important;
       }
     </style>
   </head>
-  <body>
-    <div class="container">
-      <!-- Giao diện 1: Cài đặt thông tin -->
-      <div id="setup-view">
-        <h1>Cài đặt Lucky Draw</h1>
-        <form id="setup-form">
-          <div class="form-group">
-            <label for="lottery-title-input"
-              >Tên chương trình Lucky Draw:</label
+  <body class="flex flex-col items-center justify-center p-4">
+    <canvas
+      id="bg-canvas"
+      class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none"
+    ></canvas>
+
+    <!-- ===== SECTION 1: CÀI ĐẶT ===== -->
+    <div
+      id="setup-view"
+      class="w-full max-w-2xl glass-panel rounded-2xl p-8 shadow-2xl animate-fade-in"
+    >
+      <h1
+        class="text-3xl font-black text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+      >
+        SETTING
+      </h1>
+
+      <form id="setup-form" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1 uppercase"
+              >Tên Chương Trình</label
             >
             <input
-              type="text"
               id="lottery-title-input"
-              placeholder="Nhập tên chương trình (mặc định: Lucky Draw)"
+              type="text"
+              placeholder="Có thể bỏ trống"
+              class="w-full"
             />
           </div>
-
-          <div class="form-group">
-            <label for="num-digits">Số lượng ký tự mã số (1-10):</label>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1 uppercase"
+              >Số ký tự mã (1-20)</label
+            >
             <input
-              type="number"
               id="num-digits"
-              value="6"
+              type="number"
               min="1"
-              max="10"
+              max="20"
+              value="6"
               required
+              class="w-full"
             />
-          </div>
-
-          <div class="form-group">
-            <label for="customer-file"
-              >Tải lên file CSV thông tin người chơi:</label
-            >
-            <input type="file" id="customer-file" accept=".csv" required />
-            <small
-              ><i
-                >*File CSV cần có cột "ma_so" và "ten_kh" (viết liền không dấu).
-                Mã số có thể chứa chữ và số.</i
-              ></small
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="background-file">Chọn ảnh nền (tùy chọn):</label>
-            <input type="file" id="background-file" accept="image/*" />
-          </div>
-
-          <div class="form-group">
-            <label>Thông tin giải thưởng:</label>
-            <div id="prizes-container">
-              <!-- Các giải thưởng sẽ được thêm vào đây -->
-            </div>
-            <button
-              type="button"
-              id="add-prize-btn"
-              class="btn btn-tertiary"
-              style="margin-top: 1rem"
-            >
-              + Thêm giải thưởng
-            </button>
-          </div>
-
-          <div class="checkbox-container">
-            <input type="checkbox" id="multi-winner-mode" />
-            <label for="multi-winner-mode">Quay nhiều giải cùng lúc</label>
-          </div>
-
-          <button type="submit" class="btn btn-primary">
-            Bắt đầu Chương trình
-          </button>
-        </form>
-      </div>
-
-      <!-- Giao diện 2: Xổ số chính -->
-      <div id="main-view" class="hidden">
-        <div id="main-lottery-interface">
-          <h1 id="lottery-title-display">Lucky Draw</h1>
-          <div id="lottery-display">
-            <!-- Các ô số sẽ được tạo bằng JavaScript -->
-          </div>
-
-          <div class="controls">
-            <select id="prize-select" class="btn"></select>
-            <button id="start-btn" class="btn">QUAY SỐ</button>
-          </div>
-
-          <div id="winner-info" class="hidden">
-            <h3>CHÚC MỪNG</h3>
-            <p>
-              Người chơi: <strong id="winner-name"></strong> - Mã số:
-              <strong id="winner-code"></strong>
-            </p>
-          </div>
-
-          <div id="multiple-winners-info" class="hidden">
-            <h3>CHÚC MỪNG</h3>
-            <p>Giải thưởng: <strong id="multi-prize-name"></strong></p>
-            <ul id="multi-winners-list"></ul>
           </div>
         </div>
 
-        <div class="history hidden">
-          <h2>Danh sách trúng thưởng</h2>
-          <table id="history-table">
-            <thead>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1 uppercase"
+            >File Danh Sách (.CSV)</label
+          >
+          <input
+            id="customer-file"
+            type="file"
+            accept=".csv"
+            required
+            class="w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
+          />
+          <p class="text-[10px] text-gray-500 mt-1">
+            *Cột bắt buộc: "ma_so" và "ten_kh"
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1 uppercase"
+            >Ảnh nền (Tùy chọn)</label
+          >
+          <input
+            id="background-file"
+            type="file"
+            accept="image/*"
+            class="w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary/20 file:text-secondary hover:file:bg-secondary/30"
+          />
+        </div>
+
+        <div
+          class="p-4 bg-white/5 rounded-lg border border-white/5 grid grid-cols-2 gap-4"
+        >
+          <div>
+            <label
+              class="flex justify-between text-xs font-bold text-gray-400 mb-1"
+            >
+              <span>ĐỘ MỜ PANEL</span>
+              <span id="opacity-label" class="text-primary">0.6</span>
+            </label>
+            <input
+              id="opacity-range"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value="0.6"
+              class="w-full accent-primary h-1 bg-gray-700 rounded appearance-none cursor-pointer"
+            />
+          </div>
+          <div>
+            <label
+              class="flex justify-between text-xs font-bold text-gray-400 mb-1"
+            >
+              <span>ĐỘ BLUR</span>
+              <span id="blur-label" class="text-primary">10px</span>
+            </label>
+            <input
+              id="blur-range"
+              type="range"
+              min="0"
+              max="20"
+              step="1"
+              value="10"
+              class="w-full accent-primary h-1 bg-gray-700 rounded appearance-none cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative">
+              <input
+                type="checkbox"
+                id="multi-winner-mode"
+                class="peer sr-only"
+              />
+              <div
+                class="w-10 h-6 bg-gray-700 rounded-full peer-checked:bg-primary transition-all"
+              ></div>
+              <div
+                class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-all"
+              ></div>
+            </div>
+            <span
+              class="text-sm font-semibold group-hover:text-white transition"
+              >Quay nhiều giải</span
+            >
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative">
+              <input type="checkbox" id="pairing-mode" class="peer sr-only" />
+              <div
+                class="w-10 h-6 bg-gray-700 rounded-full peer-checked:bg-secondary transition-all"
+              ></div>
+              <div
+                class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-all"
+              ></div>
+            </div>
+            <span
+              class="text-sm font-semibold group-hover:text-white transition"
+              >Ghép cặp</span
+            >
+          </label>
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <label class="block text-xs font-bold text-gray-400 mb-2 uppercase"
+            >Cơ Cấu Giải Thưởng</label
+          >
+          <!-- Prizes Container -->
+          <div
+            id="prizes-container"
+            class="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar"
+          ></div>
+          <button
+            type="button"
+            id="add-prize-btn"
+            class="mt-2 text-xs flex items-center gap-1 text-primary hover:text-white transition"
+          >
+            <span class="text-lg">+</span> Thêm giải thưởng
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-4 rounded-xl btn-neon text-lg mt-4"
+        >
+          READY
+        </button>
+      </form>
+    </div>
+
+    <!-- ===== SECTION 2: MAIN VIEW ===== -->
+    <div
+      id="main-view"
+      class="hidden w-full max-w-7xl flex-col items-center relative"
+    >
+      <header
+        class="w-full flex justify-center items-center mb-8 px-4 relative"
+      >
+        <h1
+          id="lottery-title-display"
+          class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 tracking-wider drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] text-center"
+        >
+          LUCKY DRAW
+        </h1>
+      </header>
+
+      <div class="w-full relative py-12 flex justify-center">
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-32 bg-primary/20 blur-[80px] rounded-full pointer-events-none"
+        ></div>
+        <div id="lottery-display" class="scene z-10"></div>
+      </div>
+
+      <div
+        class="w-full max-w-4xl glass-panel rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 border border-primary/20 shadow-[0_0_30px_rgba(0,242,255,0.1)]"
+      >
+        <select
+          id="prize-select"
+          class="bg-dark/50 border border-white/10 text-white rounded-lg p-3 flex-1 font-mono text-sm focus:border-primary w-full"
+        ></select>
+        <button
+          id="start-btn"
+          class="px-10 py-3 rounded-xl btn-neon font-black text-xl min-w-[200px] relative overflow-hidden group"
+        >
+          <span class="relative z-10">QUAY SỐ</span>
+          <div
+            class="absolute inset-0 bg-white/30 blur opacity-0 group-hover:opacity-100 transition"
+          ></div>
+        </button>
+      </div>
+
+      <div class="w-full max-w-5xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="glass-panel rounded-2xl p-6 min-h-[300px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+        >
+          <div
+            id="winner-info"
+            class="hidden animate-zoom-in w-full flex flex-col items-center"
+          >
+            <div
+              class="text-accent font-bold tracking-widest mb-2 uppercase text-sm"
+            >
+              Chúc mừng
+            </div>
+            <div
+              id="winner-name"
+              class="text-3xl md:text-4xl font-bold text-white mb-2 text-glow"
+            ></div>
+            <div
+              id="winner-code"
+              class="text-xl font-mono text-primary bg-primary/10 px-4 py-1 rounded-full inline-block border border-primary/30 mb-4"
+            ></div>
+          </div>
+
+          <div
+            id="waiting-msg"
+            class="text-gray-500 font-mono text-xs uppercase tracking-widest animate-pulse"
+          >
+            Hệ thống sẵn sàng...
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-1 flex flex-col h-[300px]">
+          <div class="flex border-b border-white/10 p-2 gap-2" id="lists-tabs">
+            <button
+              class="flex-1 py-2 text-sm font-bold rounded-lg bg-white/10 text-white tab-btn is-active"
+              data-tab="tab-winners"
+            >
+              Danh sách
+              <span
+                id="count-winners"
+                class="bg-primary text-black text-[10px] px-1.5 rounded-full ml-1"
+                >0</span
+              >
+            </button>
+            <button
+              id="tab-btn-pairs"
+              class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-400 hover:bg-white/5 tab-btn hidden"
+              data-tab="tab-pairs"
+            >
+              Cặp đôi
+              <span
+                id="count-pairs"
+                class="bg-secondary text-white text-[10px] px-1.5 rounded-full ml-1"
+                >0</span
+              >
+            </button>
+          </div>
+          <div class="flex-1 overflow-hidden relative p-2">
+            <ul
+              id="tab-winners"
+              class="tab-panel active h-full overflow-y-auto custom-scrollbar space-y-1"
+            ></ul>
+            <ul
+              id="tab-pairs"
+              class="tab-panel hidden h-full overflow-y-auto custom-scrollbar space-y-1"
+            ></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY PANEL (Ẩn mặc định, hiện bằng phím F1) -->
+      <div
+        id="history-panel"
+        class="fixed inset-0 z-50 bg-dark/95 backdrop-blur-xl hidden flex flex-col p-4 md:p-10 animate-fade-in"
+      >
+        <div
+          class="flex justify-between items-center mb-6 max-w-6xl mx-auto w-full"
+        >
+          <h2 class="text-3xl font-bold text-primary">LỊCH SỬ QUAY SỐ</h2>
+          <button
+            id="close-history-btn"
+            class="text-gray-400 hover:text-white text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div
+          class="flex-1 overflow-auto max-w-6xl mx-auto w-full border border-white/10 rounded-xl bg-black/20"
+        >
+          <table id="history-table" class="w-full text-left text-sm">
+            <thead
+              class="bg-white/5 text-gray-400 sticky top-0 backdrop-blur-md"
+            >
               <tr>
-                <th>Giải thưởng</th>
-                <th>Mã số trúng thưởng</th>
-                <th>Tên người chơi</th>
+                <th class="p-4">Hạng mục</th>
+                <th class="p-4">Mã số</th>
+                <th class="p-4">Tên người chơi</th>
               </tr>
             </thead>
-            <tbody id="history-body"></tbody>
+            <tbody
+              id="history-body"
+              class="divide-y divide-white/5 text-gray-200"
+            ></tbody>
           </table>
+        </div>
+
+        <div class="max-w-6xl mx-auto w-full flex gap-4 mt-6">
+          <button
+            id="export-btn"
+            class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold flex-1"
+          >
+            Xuất CSV
+          </button>
           <button
             id="reset-btn"
-            class="btn btn-secondary"
-            style="margin-top: 1.5rem"
+            class="px-6 py-3 bg-red-900/50 hover:bg-red-800 text-red-200 rounded-lg font-bold"
           >
             Cài đặt lại
           </button>
@@ -607,557 +593,902 @@
       </div>
     </div>
 
-    <!-- Confirmation Modal HTML -->
-    <div id="confirmation-modal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>Xác nhận Giải thưởng</h3>
-        <p>
-          Người chơi <strong id="modal-winner-name"></strong> với mã số
-          <strong id="modal-winner-code"></strong> đã trúng thưởng.
+    <!-- ===== MODALS ===== -->
+
+    <div
+      id="confirmation-modal"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="glass-panel p-8 rounded-2xl max-w-md w-full text-center border border-primary/30 shadow-[0_0_50px_rgba(0,242,255,0.2)] transform scale-95 transition-transform duration-300"
+        id="confirm-content"
+      >
+        <h3 class="text-2xl font-bold text-white mb-4">XÁC NHẬN KẾT QUẢ</h3>
+        <p class="text-gray-300 mb-6">
+          Người chơi
+          <strong id="modal-winner-name" class="text-primary text-lg"></strong>
+          (<span id="modal-winner-code" class="font-mono"></span>) đã trúng
+          thưởng?
         </p>
-        <div class="modal-buttons">
+        <div class="flex gap-4 justify-center">
           <button
             id="confirm-btn"
-            class="btn"
-            style="background-color: var(--success-color); color: white"
+            class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded hover:scale-105 transition"
           >
-            Đồng ý
+            CHẤP NHẬN
           </button>
           <button
             id="redraw-btn"
-            class="btn"
-            style="background-color: var(--danger-color); color: white"
+            class="px-6 py-2 bg-white/10 text-gray-300 font-bold rounded hover:bg-white/20 transition"
           >
-            Quay lại
+            QUAY LẠI
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Custom Alert/Confirm Modal -->
-    <div id="custom-alert-modal" class="modal-overlay">
-      <div class="modal-content">
-        <h3 id="custom-alert-title">Thông báo</h3>
-        <p id="custom-alert-message"></p>
-        <div class="modal-buttons">
+    <div
+      id="restore-modal"
+      class="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 hidden"
+    >
+      <div
+        class="bg-gray-900 border border-white/20 p-6 rounded-xl max-w-md w-full text-center shadow-2xl"
+      >
+        <h3 class="text-xl font-bold text-primary mb-4 uppercase">
+          Phát hiện phiên cũ
+        </h3>
+        <p class="text-gray-300 mb-6">
+          Hệ thống phát hiện có phiên quay thưởng chưa kết thúc. Bạn có muốn
+          khôi phục lại không?
+        </p>
+        <div class="flex gap-4 justify-center">
           <button
-            id="custom-alert-ok-btn"
-            class="btn"
-            style="background-color: var(--primary-color); color: white"
+            id="restore-yes-btn"
+            class="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded font-bold"
           >
-            OK
+            Khôi phục
+          </button>
+          <button
+            id="restore-no-btn"
+            class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded"
+          >
+            Bỏ qua
           </button>
         </div>
+      </div>
+    </div>
+
+    <div
+      id="custom-alert-modal"
+      class="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 hidden"
+    >
+      <div
+        class="bg-gray-900 border border-white/20 p-6 rounded-xl max-w-sm w-full text-center"
+      >
+        <h3 id="custom-alert-title" class="text-xl font-bold text-accent mb-2">
+          Thông báo
+        </h3>
+        <p id="custom-alert-message" class="text-gray-300 mb-6"></p>
+        <button
+          id="custom-alert-ok-btn"
+          class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded"
+        >
+          OK
+        </button>
       </div>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // === Vô hiệu hóa chuột phải và phím F12 ===
-        // Ngăn chặn menu chuột phải
-        document.addEventListener("contextmenu", (event) =>
-          event.preventDefault()
-        );
+        // --- Helper: Visual Effects & 3D Logic ---
 
-        // Ngăn chặn phím F12 và các tổ hợp phím liên quan, bao gồm Ctrl + S
-        document.addEventListener("keydown", (event) => {
-          if (
-            event.key === "F12" ||
-            (event.ctrlKey && event.shiftKey && event.key === "I") || // Ctrl+Shift+I
-            (event.ctrlKey && event.shiftKey && event.key === "J") || // Ctrl+Shift+J
-            (event.ctrlKey && event.key === "U") || // Ctrl+U
-            ((event.ctrlKey || event.metaKey) && event.key === "s")
-          ) {
-            // Ctrl+S hoặc Cmd+S
-            event.preventDefault();
+        const create3DCubes = (container, count) => {
+          container.innerHTML = "";
+          let fontSize = "3.5rem";
+          if (count > 8) fontSize = "2rem";
+          if (count > 12) fontSize = "1.5rem";
+
+          for (let i = 0; i < count; i++) {
+            const wrap = document.createElement("div");
+            wrap.className = "cube-container";
+            if (count > 8) {
+              wrap.style.width = "50px";
+              wrap.style.height = "70px";
+            }
+
+            const cube = document.createElement("div");
+            cube.className = "cube";
+            cube.id = `cube-${i}`;
+
+            // Random animation duration for more dynamic effect
+            const randomDuration = 0.2 + Math.random() * 0.3;
+            cube.style.animationDuration = `${randomDuration}s`;
+
+            ["front", "back", "top", "bottom"].forEach((face) => {
+              const div = document.createElement("div");
+              div.className = `cube-face cube-face-${face}`;
+              if (face === "front") {
+                div.textContent = "-";
+                div.style.fontSize = fontSize;
+              }
+              cube.appendChild(div);
+            });
+            wrap.appendChild(cube);
+            container.appendChild(wrap);
           }
-        });
+        };
 
-        // === DOM Elements ===
-        const setupView = document.getElementById("setup-view");
-        const mainView = document.getElementById("main-view");
-        const setupForm = document.getElementById("setup-form");
-        const addPrizeBtn = document.getElementById("add-prize-btn");
-        const prizesContainer = document.getElementById("prizes-container");
-        const customerFileInput = document.getElementById("customer-file");
-        const backgroundFileInput = document.getElementById("background-file");
-        const numDigitsInput = document.getElementById("num-digits");
-        const multiWinnerModeCheckbox =
-          document.getElementById("multi-winner-mode");
-        const lotteryTitleInput = document.getElementById(
-          "lottery-title-input"
-        );
-        const lotteryTitleDisplay = document.getElementById(
-          "lottery-title-display"
-        );
+        const setCubeSpin = (index, isSpinning) => {
+          const cube = document.getElementById(`cube-${index}`);
+          if (!cube) return;
+          if (isSpinning) {
+            cube.classList.add("spinning");
+          } else {
+            cube.classList.remove("spinning");
+          }
+        };
 
-        const mainLotteryInterface = document.getElementById(
-          "main-lottery-interface"
-        );
-        const historySection = document.querySelector(".history");
-        const lotteryDisplay = document.getElementById("lottery-display");
-        const prizeSelect = document.getElementById("prize-select");
-        const startBtn = document.getElementById("start-btn");
-        const resetBtn = document.getElementById("reset-btn");
-        const winnerInfo = document.getElementById("winner-info");
-        const winnerNameSpan = document.getElementById("winner-name");
-        const winnerCodeSpan = document.getElementById("winner-code");
-        const multipleWinnersInfo = document.getElementById(
-          "multiple-winners-info"
-        );
-        const multiPrizeNameSpan = document.getElementById("multi-prize-name");
-        const multiWinnersList = document.getElementById("multi-winners-list");
-        const historyBody = document.getElementById("history-body");
+        const getRandomChar = () => {
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          return chars[Math.floor(Math.random() * chars.length)];
+        };
 
-        // Modal Elements
-        const confirmationModal = document.getElementById("confirmation-modal");
-        const modalWinnerName = document.getElementById("modal-winner-name");
-        const modalWinnerCode = document.getElementById("modal-winner-code");
-        const confirmBtn = document.getElementById("confirm-btn");
-        const redrawBtn = document.getElementById("redraw-btn");
+        // --- MAIN LOGIC ---
 
-        const customAlertModal = document.getElementById("custom-alert-modal");
-        const customAlertTitle = document.getElementById("custom-alert-title");
-        const customAlertMessage = document.getElementById(
-          "custom-alert-message"
-        );
-        const customAlertOkBtn = document.getElementById("custom-alert-ok-btn");
-
-        // === Application State ===
         let customers = [];
         let prizes = [];
         let winners = [];
         let numDigits = 6;
-        let animationInterval;
         let tempWinner = null;
         let tempPrize = null;
         let isMultiWinnerMode = false;
+        let pairingEnabled = false;
+        let pendingPartner = null;
+        let pairs = [];
 
-        // === Functions ===
+        /* DOM Elements */
+        const setupView = document.getElementById("setup-view");
+        const mainView = document.getElementById("main-view");
+        const setupForm = document.getElementById("setup-form");
+        const prizesContainer = document.getElementById("prizes-container");
+        const lotteryDisplay = document.getElementById("lottery-display");
+        const prizeSelect = document.getElementById("prize-select");
+        const startBtn = document.getElementById("start-btn");
+        const winnerInfo = document.getElementById("winner-info");
+        const winnerNameSpan = document.getElementById("winner-name");
+        const winnerCodeSpan = document.getElementById("winner-code");
+        const historyBody = document.getElementById("history-body");
 
-        // Custom alert and confirm replacements
-        const showAlert = (message, title = "Thông báo") => {
-          customAlertTitle.textContent = title;
-          customAlertMessage.textContent = message;
-          customAlertModal.classList.add("visible");
+        const recentWinnersList = document.getElementById("tab-winners");
+        const pairsList = document.getElementById("tab-pairs");
+
+        const confirmationModal = document.getElementById("confirmation-modal");
+        const confirmBtn = document.getElementById("confirm-btn");
+        const redrawBtn = document.getElementById("redraw-btn");
+        const tabBtnPairs = document.getElementById("tab-btn-pairs");
+
+        /* Utilities */
+        const showAlert = (message) => {
+          const modal = document.getElementById("custom-alert-modal");
+          const msg = document.getElementById("custom-alert-message");
+          const ok = document.getElementById("custom-alert-ok-btn");
+          if (!modal || !msg || !ok) return Promise.resolve();
+
+          msg.textContent = message;
+          modal.classList.remove("hidden");
           return new Promise((resolve) => {
-            const okBtnListener = () => {
-              customAlertModal.classList.remove("visible");
-              customAlertOkBtn.removeEventListener("click", okBtnListener);
+            ok.onclick = () => {
+              modal.classList.add("hidden");
               resolve();
             };
-            customAlertOkBtn.addEventListener("click", okBtnListener);
           });
         };
 
-        const addPrizeRow = () => {
-          const prizeItemId = "prize-item-" + Date.now();
-          const prizeItem = document.createElement("div");
-          prizeItem.className = "prize-item";
-          prizeItem.id = prizeItemId;
-          prizeItem.innerHTML = `
-                <input type="text" placeholder="Tên giải thưởng (ví dụ: Giải Nhất)" required>
-                <input type="number" placeholder="Số lượng" min="1" value="1" required>
-                <button type="button" class="remove-prize-btn" onclick="document.getElementById('${prizeItemId}').remove()">-</button>
-            `;
-          prizesContainer.appendChild(prizeItem);
+        // --- SESSION STORAGE LOGIC ---
+        const saveSession = () => {
+          const sessionData = {
+            customers,
+            prizes,
+            winners,
+            pairs,
+            config: {
+              numDigits,
+              isMultiWinnerMode,
+              pairingEnabled,
+              title: document.getElementById("lottery-title-display")
+                .textContent,
+              // Note: cannot verify background image easily, so we skip it
+            },
+          };
+          localStorage.setItem("luckyDrawSession", JSON.stringify(sessionData));
         };
-        addPrizeRow();
 
-        const parseCSV = (data) => {
-          const rows = data.split(/\r?\n/).filter((row) => row.trim() !== "");
+        const clearSession = () => {
+          localStorage.removeItem("luckyDrawSession");
+        };
+
+        const restoreSession = () => {
+          const raw = localStorage.getItem("luckyDrawSession");
+          if (!raw) return;
+          try {
+            const data = JSON.parse(raw);
+            customers = data.customers;
+            prizes = data.prizes;
+            winners = data.winners;
+            pairs = data.pairs || [];
+            numDigits = data.config.numDigits;
+            isMultiWinnerMode = data.config.isMultiWinnerMode;
+            pairingEnabled = data.config.pairingEnabled;
+
+            // Restore UI
+            const titleDisplay = document.getElementById(
+              "lottery-title-display"
+            );
+            titleDisplay.textContent = data.config.title;
+            if (!data.config.title || data.config.title === "LUCKY DRAW") {
+              // Keep default visibility logic if needed, but usually we just show what was saved
+            }
+            if (data.config.title === "") titleDisplay.classList.add("hidden");
+            else titleDisplay.classList.remove("hidden");
+
+            if (pairingEnabled) {
+              tabBtnPairs.classList.remove("hidden");
+            } else {
+              tabBtnPairs.classList.add("hidden");
+            }
+
+            initializeApp(true); // true = restoration mode
+
+            // Re-populate lists
+            // 1. Recent Winners
+            recentWinnersList.innerHTML = "";
+            // Reverse to show latest first
+            [...winners].reverse().forEach((w) => {
+              const li = document.createElement("li");
+              li.className =
+                "flex justify-between items-center bg-white/5 p-2 rounded border border-white/5 text-sm";
+              li.innerHTML = `
+                            <div>
+                                <div class="font-bold text-primary">${w.ten_kh}</div>
+                                <div class="text-xs font-mono opacity-70">${w.ma_so}</div>
+                            </div>
+                            <div class="text-xs bg-accent/20 text-accent px-2 py-1 rounded border border-accent/20">${w.prizeName}</div>
+                        `;
+              recentWinnersList.appendChild(li);
+            });
+            document.getElementById("count-winners").textContent =
+              winners.length;
+
+            // 2. Pairs
+            pairsList.innerHTML = "";
+            [...pairs].reverse().forEach((p) => {
+              const pairLi = document.createElement("li");
+              pairLi.className =
+                "bg-secondary/10 border border-secondary/30 p-2 rounded text-sm";
+              pairLi.innerHTML = `
+                            <div class="flex justify-between font-bold text-white mb-1">
+                                <span>${p.a.ten_kh}</span> <span class="text-secondary text-xs">VS</span> <span>${p.b.ten_kh}</span>
+                            </div>
+                            <div class="flex justify-between font-mono text-xs text-gray-400">
+                                <span>${p.a.ma_so}</span> <span>${p.b.ma_so}</span>
+                            </div>
+                        `;
+              pairsList.appendChild(pairLi);
+            });
+            document.getElementById("count-pairs").textContent = pairs.length;
+
+            // 3. History Table
+            historyBody.innerHTML = "";
+            [...winners].reverse().forEach((w) => {
+              const row = document.createElement("tr");
+              row.className = "hover:bg-white/5 transition";
+              row.innerHTML = `<td class="p-3 border-b border-white/5 text-accent">${w.prizeName}</td><td class="p-3 border-b border-white/5 font-mono">${w.ma_so}</td><td class="p-3 border-b border-white/5 font-bold">${w.ten_kh}</td>`;
+              historyBody.appendChild(row);
+            });
+
+            setupView.classList.add("hidden");
+            mainView.classList.remove("hidden");
+            mainView.classList.add("flex");
+          } catch (e) {
+            console.error("Restore failed", e);
+            showAlert("Dữ liệu cũ bị lỗi, không thể khôi phục.");
+            clearSession();
+          }
+        };
+
+        // Check for session on load
+        const savedSession = localStorage.getItem("luckyDrawSession");
+        if (savedSession) {
+          const restoreModal = document.getElementById("restore-modal");
+          restoreModal.classList.remove("hidden");
+
+          document.getElementById("restore-yes-btn").onclick = () => {
+            restoreModal.classList.add("hidden");
+            restoreSession();
+          };
+
+          document.getElementById("restore-no-btn").onclick = () => {
+            restoreModal.classList.add("hidden");
+            clearSession();
+          };
+        }
+
+        const addPrizeRow = (name = "", qty = 1) => {
+          const id =
+            "prize-" + Date.now() + Math.random().toString(36).substr(2, 9);
+          const div = document.createElement("div");
+          div.className =
+            "flex gap-3 items-center bg-white/5 p-3 rounded mb-2 border border-white/5 transition hover:bg-white/10 prize-row";
+          div.id = id;
+          div.innerHTML = `
+                    <input type="text" value="${name}" placeholder="Tên giải thưởng (VD: Giải Đặc Biệt)" class="flex-1 min-w-0 bg-dark/50 border border-white/10 rounded px-3 py-2 text-sm focus:border-primary focus:outline-none transition text-white" required>
+                    <input type="number" value="${qty}" placeholder="SL" class="flex-none bg-dark/50 border border-white/10 rounded px-2 py-2 text-center text-sm focus:border-primary focus:outline-none transition text-white" value="1" min="1" style="width: 100px;">
+                    <button type="button" class="delete-prize-btn text-red-400 hover:text-red-200 px-2 font-bold text-xl" title="Xóa">&times;</button>
+                `;
+          prizesContainer.appendChild(div);
+        };
+
+        // Event Delegation for Delete Prize
+        prizesContainer.addEventListener("click", (e) => {
+          if (e.target.classList.contains("delete-prize-btn")) {
+            e.target.closest(".prize-row").remove();
+          }
+        });
+
+        addPrizeRow();
+        document
+          .getElementById("add-prize-btn")
+          .addEventListener("click", () => addPrizeRow());
+
+        const parseCSV = (text) => {
+          const rows = text.split(/\r?\n/).filter((r) => r.trim() !== "");
           if (rows.length < 2) return [];
           const header = rows[0].split(",").map((h) => h.trim().toLowerCase());
-          const codeIndex = header.indexOf("ma_so");
-          const nameIndex = header.indexOf("ten_kh");
-          if (codeIndex === -1 || nameIndex === -1) {
-            throw new Error('File CSV phải chứa cột "ma_so" và "ten_kh".');
-          }
+          const codeIdx = header.indexOf("ma_so");
+          const nameIdx = header.indexOf("ten_kh");
+          if (codeIdx === -1 || nameIdx === -1)
+            throw new Error('File thiếu cột "ma_so" hoặc "ten_kh"');
+
           return rows
             .slice(1)
             .map((row) => {
-              const values = row.split(",");
-              if (values.length >= header.length) {
-                const ma_so = values[codeIndex].trim();
-                const ten_kh = values[nameIndex].trim();
-                if (ma_so && ten_kh) return { ma_so, ten_kh, isWinner: false };
+              const cols = row.split(",");
+              if (cols.length >= header.length) {
+                return {
+                  ma_so: cols[codeIdx].trim(),
+                  ten_kh: cols[nameIdx].trim(),
+                  isWinner: false,
+                };
               }
               return null;
             })
             .filter(Boolean);
         };
 
-        const initializeApp = () => {
-          lotteryDisplay.innerHTML = "";
-          for (let i = 0; i < numDigits; i++) {
-            const digitBox = document.createElement("div");
-            digitBox.className = "digit-box";
-            digitBox.textContent = "-";
-            lotteryDisplay.appendChild(digitBox);
-          }
-          updatePrizeSelect();
-          historyBody.innerHTML = "";
-          winners = [];
-          winnerInfo.style.display = "none";
-          multipleWinnersInfo.style.display = "none";
-          startBtn.disabled = false;
+        const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-          mainLotteryInterface.classList.remove("hidden");
-          historySection.classList.add("hidden");
-        };
+        const stopDigitsSequentially = (code) =>
+          new Promise(async (resolve) => {
+            const targetCode = code.toUpperCase().padStart(numDigits, " ");
+
+            for (let i = 0; i < numDigits; i++) setCubeSpin(i, true);
+
+            const shuffleInterval = setInterval(() => {
+              for (let i = 0; i < numDigits; i++) {
+                const cube = document.getElementById(`cube-${i}`);
+                if (cube && cube.classList.contains("spinning")) {
+                  const front = cube.querySelector(".cube-face-front");
+                  front.textContent = getRandomChar();
+                }
+              }
+            }, 80);
+
+            for (let i = 0; i < numDigits; i++) {
+              await wait(i === 0 ? 1000 : 600);
+              const cube = document.getElementById(`cube-${i}`);
+              if (cube) {
+                cube.classList.remove("spinning");
+                const front = cube.querySelector(".cube-face-front");
+                front.textContent = targetCode[i] || "";
+                front.classList.add("highlight");
+              }
+            }
+
+            clearInterval(shuffleInterval);
+            resolve();
+          });
 
         const updatePrizeSelect = () => {
           prizeSelect.innerHTML = "";
-          let hasAvailablePrizes = false;
-          prizes.forEach((prize, index) => {
-            const option = document.createElement("option");
-            option.value = index;
-            option.textContent = `${prize.name} (Còn lại: ${prize.remaining}/${prize.quantity})`;
-            if (prize.remaining === 0) {
-              option.disabled = true;
-              option.style.color = "#999";
-            } else {
-              hasAvailablePrizes = true;
-            }
-            prizeSelect.appendChild(option);
+          let has = false;
+          prizes.forEach((p, i) => {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.textContent = `${p.name} (Còn: ${p.remaining}/${p.quantity})`;
+            opt.className = "bg-dark text-white";
+            if (p.remaining === 0) {
+              opt.disabled = true;
+              opt.textContent += " - HẾT";
+            } else has = true;
+            prizeSelect.appendChild(opt);
           });
-          startBtn.disabled = !hasAvailablePrizes;
-          if (!hasAvailablePrizes) {
-            startBtn.textContent = "HẾT GIẢI";
-          } else {
-            startBtn.textContent = "QUAY SỐ";
+          startBtn.disabled = !has;
+          startBtn.querySelector("span").textContent = has
+            ? "QUAY SỐ"
+            : "HẾT GIẢI";
+          document.getElementById("waiting-msg").textContent = has
+            ? "Sẵn sàng..."
+            : "Đã trao hết giải thưởng!";
+        };
+
+        const initializeApp = (isRestore = false) => {
+          create3DCubes(lotteryDisplay, numDigits);
+          updatePrizeSelect();
+
+          if (!isRestore) {
+            winners = [];
+            pairs = [];
+            recentWinnersList.innerHTML = "";
+            pairsList.innerHTML = "";
+            historyBody.innerHTML = "";
+            document.getElementById("count-winners").textContent = "0";
+            document.getElementById("count-pairs").textContent = "0";
+          }
+
+          startBtn.disabled = false;
+          setupView.classList.add("hidden");
+          mainView.classList.remove("hidden");
+          mainView.classList.add("flex");
+
+          // First save
+          saveSession();
+        };
+
+        const updateListUI = (winner, prizeName) => {
+          const li = document.createElement("li");
+          li.className =
+            "flex justify-between items-center bg-white/5 p-2 rounded border border-white/5 text-sm animate-fade-in";
+          li.innerHTML = `
+                    <div>
+                        <div class="font-bold text-primary">${winner.ten_kh}</div>
+                        <div class="text-xs font-mono opacity-70">${winner.ma_so}</div>
+                    </div>
+                    <div class="text-xs bg-accent/20 text-accent px-2 py-1 rounded border border-accent/20">${prizeName}</div>
+                `;
+          recentWinnersList.prepend(li);
+          document.getElementById("count-winners").textContent =
+            recentWinnersList.children.length;
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-white/5 transition";
+          row.innerHTML = `<td class="p-3 border-b border-white/5 text-accent">${prizeName}</td><td class="p-3 border-b border-white/5 font-mono">${winner.ma_so}</td><td class="p-3 border-b border-white/5 font-bold">${winner.ten_kh}</td>`;
+          historyBody.prepend(row);
+
+          if (pairingEnabled) {
+            if (!pendingPartner) {
+              pendingPartner = winner;
+            } else {
+              const p1 = pendingPartner;
+              const p2 = winner;
+              pendingPartner = null;
+              const newPair = { a: p1, b: p2 };
+              pairs.push(newPair); // Save to state
+
+              const pairLi = document.createElement("li");
+              pairLi.className =
+                "bg-secondary/10 border border-secondary/30 p-2 rounded text-sm animate-zoom-in";
+              pairLi.innerHTML = `
+                            <div class="flex justify-between font-bold text-white mb-1">
+                                <span>${p1.ten_kh}</span> <span class="text-secondary text-xs">VS</span> <span>${p2.ten_kh}</span>
+                            </div>
+                            <div class="flex justify-between font-mono text-xs text-gray-400">
+                                <span>${p1.ma_so}</span> <span>${p2.ma_so}</span>
+                            </div>
+                        `;
+              pairsList.prepend(pairLi);
+              document.getElementById("count-pairs").textContent =
+                pairsList.children.length;
+            }
           }
         };
 
-        // Reset the lottery display for the next draw
-        const resetLotteryDisplay = () => {
-          const digitBoxes = lotteryDisplay.children;
-          for (const box of digitBoxes) {
-            box.classList.remove("stopped");
-            box.textContent = "-";
+        const triggerConfetti = () => {
+          if (typeof confetti === "function") {
+            confetti({
+              particleCount: 150,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ["#00f2ff", "#7000ff", "#ff0055"],
+            });
           }
         };
 
-        // Cập nhật giao diện sau khi có một người trúng giải
         const finalizeSingleWinner = (winner, prize) => {
           winnerNameSpan.textContent = winner.ten_kh;
           winnerCodeSpan.textContent = winner.ma_so;
-          winnerInfo.style.display = "block";
           winnerInfo.classList.remove("hidden");
+          document.getElementById("waiting-msg").classList.add("hidden");
 
-          // Thêm người trúng vào lịch sử
-          const historyRow = document.createElement("tr");
-          historyRow.innerHTML = `
-                <td>${prize.name}</td>
-                <td>${winner.ma_so}</td>
-                <td>${winner.ten_kh}</td>
-            `;
-          historyBody.prepend(historyRow);
+          triggerConfetti();
+
+          updateListUI(winner, prize.name);
           winners.push({ ...winner, prizeName: prize.name });
-
           updatePrizeSelect();
           prizeSelect.disabled = false;
           startBtn.disabled = false;
+
+          // SAVE STATE
+          saveSession();
         };
 
-        // Thêm người trúng vào danh sách hiển thị nhiều người và lịch sử
-        const addWinnerToMultiList = (winner, prize) => {
-          const li = document.createElement("li");
-          li.innerHTML = `<strong>${winner.ten_kh}</strong> - Mã số: ${winner.ma_so}`;
-          multiWinnersList.appendChild(li);
-
-          const historyRow = document.createElement("tr");
-          historyRow.innerHTML = `
-                <td>${prize.name}</td>
-                <td>${winner.ma_so}</td>
-                <td>${winner.ten_kh}</td>
-            `;
-          historyBody.prepend(historyRow);
-          winners.push({ ...winner, prizeName: prize.name });
-        };
-
-        const showConfirmationModal = (winner) => {
-          modalWinnerName.textContent = winner.ten_kh;
-          modalWinnerCode.textContent = winner.ma_so;
-          confirmationModal.classList.add("visible");
-        };
-
-        const hideConfirmationModal = () => {
-          confirmationModal.classList.remove("visible");
-        };
-
-        const stopDigitsSequentially = (winnerCode) => {
-          return new Promise((resolve) => {
-            const digitBoxes = lotteryDisplay.children;
-            const paddedWinnerCode = winnerCode
-              .toUpperCase()
-              .padStart(numDigits, " ");
-            let interval;
-            let i = 0;
-
-            // Dừng từng ô số một
-            const stopNextDigit = () => {
-              if (i < numDigits) {
-                const box = digitBoxes[i];
-                box.classList.add("stopped");
-                box.textContent = paddedWinnerCode[i] || " ";
-                i++;
-                setTimeout(stopNextDigit, 500); // Tăng thời gian dừng để tạo hiệu ứng tốt hơn
-              } else {
-                clearInterval(interval);
-                resolve();
-              }
-            };
-
-            // Chạy hiệu ứng quay số
-            interval = setInterval(() => {
-              for (let j = 0; j < numDigits; j++) {
-                if (!digitBoxes[j].classList.contains("stopped")) {
-                  const alphanumericChars =
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                  const randomIndex = Math.floor(
-                    Math.random() * alphanumericChars.length
-                  );
-                  digitBoxes[j].textContent = alphanumericChars[randomIndex];
-                }
-              }
-            }, 100);
-
-            stopNextDigit();
-          });
-        };
-
-        // Hộp thoại xác nhận cho chế độ 1 người trúng
-        const runSingleWinnerLotterySequence = (winner, prize) => {
+        const runSingleLottery = async (winner, prize) => {
           startBtn.disabled = true;
           prizeSelect.disabled = true;
-          winnerInfo.style.display = "none";
-          multipleWinnersInfo.style.display = "none";
+          winnerInfo.classList.add("hidden");
+          document.getElementById("waiting-msg").classList.remove("hidden");
+          document.getElementById("waiting-msg").textContent =
+            "Đang quay số...";
 
-          // Reset the display before running the animation
-          resetLotteryDisplay();
+          document
+            .querySelectorAll(".cube-face-front")
+            .forEach((el) => el.classList.remove("highlight"));
 
-          stopDigitsSequentially(winner.ma_so).then(() => {
-            showConfirmationModal(winner);
-            tempWinner = winner;
-            tempPrize = prize;
-          });
+          await stopDigitsSequentially(winner.ma_so);
+
+          tempWinner = winner;
+          tempPrize = prize;
+          document.getElementById("modal-winner-name").textContent =
+            winner.ten_kh;
+          document.getElementById("modal-winner-code").textContent =
+            winner.ma_so;
+
+          const modal = document.getElementById("confirmation-modal");
+          const content = document.getElementById("confirm-content");
+          if (modal && content) {
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+              modal.classList.remove("opacity-0");
+              content.classList.remove("scale-95");
+              content.classList.add("scale-100");
+            }, 10);
+          }
         };
 
-        // Logic quay số cho nhiều người
-        const runMultiWinnerLottery = async (prize) => {
+        const runMultiLottery = async (prize) => {
           startBtn.disabled = true;
           prizeSelect.disabled = true;
-          winnerInfo.style.display = "none";
 
-          const availableCustomers = customers.filter((c) => !c.isWinner);
-          if (availableCustomers.length < prize.remaining) {
-            showAlert(
-              `Không đủ người chơi để quay giải này. Còn ${prize.remaining} giải thưởng nhưng chỉ còn ${availableCustomers.length} người.`
-            );
+          winnerInfo.classList.add("hidden");
+          document.getElementById("waiting-msg").classList.remove("hidden");
+          document.getElementById("waiting-msg").textContent =
+            "Đang quay số...";
+
+          const available = customers.filter((c) => !c.isWinner);
+          const count = Math.min(available.length, prize.remaining);
+
+          if (count === 0) {
+            await showAlert("Không còn ai để quay!");
             startBtn.disabled = false;
-            prizeSelect.disabled = false;
             return;
           }
 
-          multipleWinnersInfo.style.display = "block";
-          multiPrizeNameSpan.textContent = prize.name;
-          multiWinnersList.innerHTML = "";
+          for (let i = 0; i < count; i++) {
+            const remainingPlayers = customers.filter((c) => !c.isWinner);
+            if (remainingPlayers.length === 0) break;
 
-          for (let i = 0; i < prize.remaining; i++) {
-            const winnerIndex = Math.floor(
-              Math.random() * availableCustomers.length
-            );
-            const winner = availableCustomers.splice(winnerIndex, 1)[0];
-            winner.isWinner = true; // Mark as winner
+            const idx = Math.floor(Math.random() * remainingPlayers.length);
+            const winner = remainingPlayers[idx];
+            winner.isWinner = true;
+
+            document
+              .querySelectorAll(".cube-face-front")
+              .forEach((el) => el.classList.remove("highlight"));
 
             await stopDigitsSequentially(winner.ma_so);
 
-            // Hiển thị người trúng hiện tại
+            document.getElementById("waiting-msg").classList.add("hidden");
             winnerInfo.classList.remove("hidden");
             winnerNameSpan.textContent = winner.ten_kh;
             winnerCodeSpan.textContent = winner.ma_so;
 
-            // Thêm người trúng vào danh sách và lịch sử
-            addWinnerToMultiList(winner, prize);
+            updateListUI(winner, prize.name);
+            winners.push({ ...winner, prizeName: prize.name });
 
-            // Chờ một chút trước khi quay người tiếp theo
-            if (i < prize.remaining - 1) {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-              // Xóa hiệu ứng đã dừng để chuẩn bị cho lượt quay mới
-              resetLotteryDisplay();
+            prize.remaining--;
+            updatePrizeSelect();
+
+            // SAVE STATE INSIDE LOOP FOR SAFETY
+            saveSession();
+
+            if (i < count - 1) {
+              await wait(1500);
               winnerInfo.classList.add("hidden");
+              document.getElementById("waiting-msg").classList.remove("hidden");
             }
           }
 
-          prize.remaining = 0;
-          updatePrizeSelect();
+          triggerConfetti();
           startBtn.disabled = false;
           prizeSelect.disabled = false;
         };
 
-        // === Event Listeners ===
-        addPrizeBtn.addEventListener("click", addPrizeRow);
-
         setupForm.addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          const lotteryTitle = lotteryTitleInput.value.trim() || "Lucky Draw";
-          lotteryTitleDisplay.textContent = lotteryTitle;
+          const titleInput = document
+            .getElementById("lottery-title-input")
+            .value.trim();
+          const titleDisplay = document.getElementById("lottery-title-display");
 
-          // Handle Background Image
-          const bgFile = backgroundFileInput.files[0];
+          if (titleInput) {
+            titleDisplay.textContent = titleInput;
+            titleDisplay.classList.remove("hidden");
+          } else {
+            titleDisplay.classList.add("hidden");
+          }
+
+          const bgFile = document.getElementById("background-file").files[0];
           if (bgFile) {
             const reader = new FileReader();
-            reader.onload = function (event) {
-              document.body.style.backgroundImage = `url('${event.target.result}')`;
+            reader.onload = (ev) => {
+              document.body.style.backgroundImage = `url('${ev.target.result}')`;
               document.body.style.backgroundSize = "cover";
               document.body.style.backgroundPosition = "center";
+              document.body.style.backgroundRepeat = "no-repeat";
               document.body.style.backgroundAttachment = "fixed";
-              document.body.classList.add("custom-bg");
             };
             reader.readAsDataURL(bgFile);
           }
 
-          // Handle CSV File
-          const file = customerFileInput.files[0];
-          if (!file) {
-            await showAlert("Vui lòng chọn file người chơi!");
-            return;
-          }
+          const file = document.getElementById("customer-file").files[0];
+          if (!file) return;
+
           const reader = new FileReader();
-          reader.onload = async (event) => {
+          reader.onload = (ev) => {
             try {
-              customers = parseCSV(event.target.result);
-              if (customers.length === 0) {
-                await showAlert(
-                  "Dữ liệu người chơi trong file CSV không hợp lệ hoặc rỗng."
-                );
-                return;
-              }
+              customers = parseCSV(ev.target.result);
+              if (customers.length === 0) throw new Error("Danh sách rỗng");
+
               prizes = [];
               prizesContainer
-                .querySelectorAll(".prize-item")
-                .forEach((item) => {
-                  const name = item
-                    .querySelector('input[type="text"]')
-                    .value.trim();
-                  const quantity = parseInt(
-                    item.querySelector('input[type="number"]').value
-                  );
-                  if (name && quantity > 0) {
-                    prizes.push({ name, quantity, remaining: quantity });
-                  }
+                .querySelectorAll("div.prize-row")
+                .forEach((div) => {
+                  const inputs = div.querySelectorAll("input");
+                  const name = inputs[0].value.trim();
+                  const qty = parseInt(inputs[1].value);
+                  if (name && qty > 0)
+                    prizes.push({ name, quantity: qty, remaining: qty });
                 });
-              if (prizes.length === 0) {
-                await showAlert("Vui lòng nhập ít nhất một giải thưởng.");
-                return;
+              if (prizes.length === 0) throw new Error("Chưa nhập giải thưởng");
+
+              numDigits = parseInt(document.getElementById("num-digits").value);
+              isMultiWinnerMode =
+                document.getElementById("multi-winner-mode").checked;
+              pairingEnabled = document.getElementById("pairing-mode").checked;
+
+              if (pairingEnabled) {
+                tabBtnPairs.classList.remove("hidden");
+              } else {
+                tabBtnPairs.classList.add("hidden");
+                document.querySelector('[data-tab="tab-winners"]').click();
               }
-              numDigits = parseInt(numDigitsInput.value);
-              isMultiWinnerMode = multiWinnerModeCheckbox.checked;
+
               initializeApp();
-              setupView.classList.add("hidden");
-              mainView.classList.remove("hidden");
-            } catch (error) {
-              await showAlert("Lỗi đọc file CSV: " + error.message);
+            } catch (err) {
+              showAlert(err.message);
             }
           };
-          reader.onerror = () => showAlert("Không thể đọc file đã chọn!");
-          reader.readAsText(file, "UTF-8");
+          reader.readAsText(file);
         });
 
         startBtn.addEventListener("click", () => {
-          if (startBtn.disabled) return;
-          const selectedPrizeIndex = prizeSelect.value;
-          if (selectedPrizeIndex === "" || !prizes[selectedPrizeIndex]) return;
-          const prize = prizes[selectedPrizeIndex];
-          if (prize.remaining <= 0) return;
+          const idx = prizeSelect.value;
+          if (!prizes[idx]) return;
+          const prize = prizes[idx];
+          const available = customers.filter((c) => !c.isWinner);
 
-          const availableCustomers = customers.filter((c) => !c.isWinner);
-          if (availableCustomers.length === 0) {
-            showAlert("Tất cả người chơi đã trúng thưởng!");
-            startBtn.disabled = true;
+          if (available.length === 0) {
+            showAlert("Đã hết người chơi!");
             return;
           }
 
           if (isMultiWinnerMode) {
-            runMultiWinnerLottery(prize);
+            runMultiLottery(prize);
           } else {
-            const winnerIndex = Math.floor(
-              Math.random() * availableCustomers.length
-            );
-            tempWinner = availableCustomers[winnerIndex];
-            tempPrize = prize;
-            runSingleWinnerLotterySequence(tempWinner, tempPrize);
+            const rIdx = Math.floor(Math.random() * available.length);
+            const winner = available[rIdx];
+            runSingleLottery(winner, prize);
           }
         });
 
+        const hideConfirm = () => {
+          const modal = document.getElementById("confirmation-modal");
+          const content = document.getElementById("confirm-content");
+          if (modal && content) {
+            content.classList.remove("scale-100");
+            content.classList.add("scale-95");
+            modal.classList.add("opacity-0");
+            setTimeout(() => modal.classList.add("hidden"), 300);
+          }
+        };
+
         confirmBtn.addEventListener("click", () => {
-          if (!tempWinner || !tempPrize) return;
-          const originalCustomer = customers.find(
-            (c) => c.ma_so === tempWinner.ma_so
-          );
-          originalCustomer.isWinner = true;
-          tempPrize.remaining--;
-          finalizeSingleWinner(tempWinner, tempPrize);
-          hideConfirmationModal();
-          tempWinner = null;
-          tempPrize = null;
+          if (tempWinner && tempPrize) {
+            const realWinner = customers.find(
+              (c) => c.ma_so === tempWinner.ma_so
+            );
+            if (realWinner) realWinner.isWinner = true;
+            tempPrize.remaining--;
+            finalizeSingleWinner(tempWinner, tempPrize);
+            tempWinner = null;
+            tempPrize = null;
+            hideConfirm();
+          }
         });
 
         redrawBtn.addEventListener("click", () => {
-          if (!tempWinner) return;
-          hideConfirmationModal();
-          resetLotteryDisplay();
-          prizeSelect.disabled = false;
-          startBtn.disabled = false;
-          updatePrizeSelect();
           tempWinner = null;
           tempPrize = null;
+          hideConfirm();
+          document.querySelectorAll(".cube-face-front").forEach((el) => {
+            el.textContent = "-";
+            el.classList.remove("highlight");
+          });
+          document.getElementById("waiting-msg").textContent =
+            "Đã hủy kết quả. Sẵn sàng quay lại.";
+          startBtn.disabled = false;
+          prizeSelect.disabled = false;
         });
 
-        resetBtn.addEventListener("click", async () => {
-          const confirmed = await new Promise((resolve) => {
-            const modal = document.createElement("div");
-            modal.className = "modal-overlay visible";
-            modal.innerHTML = `
-                    <div class="modal-content">
-                        <h3>Cài đặt lại</h3>
-                        <p>Bạn có chắc muốn cài đặt lại? Mọi dữ liệu sẽ bị mất.</p>
-                        <div class="modal-buttons">
-                            <button id="modal-confirm-yes" class="btn" style="background-color: var(--danger-color); color: white;">Có</button>
-                            <button id="modal-confirm-no" class="btn" style="background-color: var(--secondary-color); color: white;">Không</button>
-                        </div>
-                    </div>
-                `;
-            document.body.appendChild(modal);
-
+        const tabBtns = document.querySelectorAll(".tab-btn");
+        tabBtns.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            tabBtns.forEach((b) => {
+              b.classList.remove("is-active", "bg-white/10", "text-white");
+              b.classList.add("text-gray-400");
+            });
+            btn.classList.add("is-active", "bg-white/10", "text-white");
+            btn.classList.remove("text-gray-400");
+            const tabId = btn.dataset.tab;
             document
-              .getElementById("modal-confirm-yes")
-              .addEventListener("click", () => {
-                document.body.removeChild(modal);
-                resolve(true);
-              });
-            document
-              .getElementById("modal-confirm-no")
-              .addEventListener("click", () => {
-                document.body.removeChild(modal);
-                resolve(false);
-              });
+              .querySelectorAll(".tab-panel")
+              .forEach((p) => p.classList.add("hidden"));
+            document.getElementById(tabId).classList.remove("hidden");
           });
-          if (confirmed) {
+        });
+
+        const updateVisuals = () => {
+          const alpha = document.getElementById("opacity-range").value;
+          const blur = document.getElementById("blur-range").value;
+          document.documentElement.style.setProperty("--panel-alpha", alpha);
+          document.documentElement.style.setProperty(
+            "--panel-blur",
+            blur + "px"
+          );
+          document.getElementById("opacity-label").textContent = alpha;
+          document.getElementById("blur-label").textContent = blur + "px";
+        };
+        document
+          .getElementById("opacity-range")
+          .addEventListener("input", updateVisuals);
+        document
+          .getElementById("blur-range")
+          .addEventListener("input", updateVisuals);
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === " ") {
+            if (!startBtn.disabled && !setupView.classList.contains("hidden"))
+              return;
+            if (
+              !startBtn.disabled &&
+              document
+                .getElementById("confirmation-modal")
+                .classList.contains("hidden")
+            ) {
+              e.preventDefault();
+              startBtn.click();
+            }
+          }
+          if (e.key === "F1") {
+            e.preventDefault();
+            const panel = document.getElementById("history-panel");
+            if (panel) panel.classList.toggle("hidden");
+          }
+        });
+
+        document
+          .getElementById("close-history-btn")
+          .addEventListener("click", () => {
+            const panel = document.getElementById("history-panel");
+            if (panel) panel.classList.add("hidden");
+          });
+
+        document.getElementById("export-btn").addEventListener("click", () => {
+          if (winners.length === 0) return showAlert("Chưa có dữ liệu!");
+          const csvContent =
+            "data:text/csv;charset=utf-8,\uFEFF" +
+            "Giai,Ma So,Ten Khach Hang\n" +
+            winners
+              .map((w) => `${w.prizeName},${w.ma_so},${w.ten_kh}`)
+              .join("\n");
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "ket_qua_lucky_draw.csv");
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        });
+
+        document.getElementById("reset-btn").addEventListener("click", () => {
+          if (confirm("Bạn muốn xóa hết và quay về màn hình cài đặt?")) {
+            clearSession(); // CLEAR SESSION ON RESET
             location.reload();
           }
         });
 
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "F1" && !mainView.classList.contains("hidden")) {
-            event.preventDefault();
+        document
+          .getElementById("toggle-history-btn")
+          .addEventListener("click", () => {
+            const panel = document.getElementById("history-panel");
+            if (panel) panel.classList.remove("hidden");
+          });
 
-            mainLotteryInterface.classList.toggle("hidden");
-            historySection.classList.toggle("hidden");
+        const initParticles = () => {
+          const canvas = document.getElementById("bg-canvas");
+          if (!canvas) return;
+          const ctx = canvas.getContext("2d");
+          let particles = [];
+          const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+          };
+          window.addEventListener("resize", resize);
+          resize();
+
+          class Particle {
+            constructor() {
+              this.reset();
+            }
+            reset() {
+              this.x = Math.random() * canvas.width;
+              this.y = Math.random() * canvas.height;
+              this.size = Math.random() * 2;
+              this.speedX = Math.random() * 0.5 - 0.25;
+              this.speedY = Math.random() * 0.5 - 0.25;
+              this.opacity = Math.random() * 0.5;
+            }
+            update() {
+              this.x += this.speedX;
+              this.y += this.speedY;
+              if (
+                this.x < 0 ||
+                this.x > canvas.width ||
+                this.y < 0 ||
+                this.y > canvas.height
+              )
+                this.reset();
+            }
+            draw() {
+              ctx.fillStyle = "#00f2ff";
+              ctx.globalAlpha = this.opacity;
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+              ctx.fill();
+            }
           }
-        });
+          for (let i = 0; i < 60; i++) particles.push(new Particle());
+          const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p) => {
+              p.update();
+              p.draw();
+            });
+            requestAnimationFrame(animate);
+          };
+          animate();
+        };
+        initParticles();
       });
     </script>
   </body>
